@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz</title>
+    <link rel="stylesheet" href="./css/global.css" />
+  </head>
+  <body>
+    <nav class="theme-btns">
+      <button id="Dark-theme-btn">Dark</button>
+      <button id="Light-theme-btn">Light</button>
+    </nav>
+    <div class="container">
+      <div class="timer-div">
+        <span class="time-left"></span>
+      </div>
+      <div class="progress-container">
+        <img src="./images/rocket.png" alt="Rocket" class="rocket" />
+        <div class="progress-bar">
+          <div class="progress">
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <!-- <div class="progress-segment"></div> -->
+          </div>
+        </div>
+        <div class="question-numbers">
+          <div class="number">1</div>
+          <div class="number">2</div>
+          <div class="number">3</div>
+          <div class="number">4</div>
+          <div class="number">5</div>
+          <div class="number">6</div>
+          <div class="number">7</div>
+          <div class="number">8</div>
+          <div class="number">9</div>
+          <div class="number">10</div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question"></div>
+        <div class="options"></div>
+        <button class="btn" id="nextBtn">Next Question</button>
+      </div>
+
+      <div class="result">
+        <h2>Quiz Results</h2>
+        <p><span id="score">0</span></p>
+      </div>
+    </div>
+    <script src="./js/script.js"></script>
+  </body>
+</html>
