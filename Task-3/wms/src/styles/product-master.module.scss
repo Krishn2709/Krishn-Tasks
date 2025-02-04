@@ -1,5 +1,46 @@
+.parentContainer {
+  margin: 0 170px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.published {
+  border-radius: 10px;
+  background-color: lightgreen;
+  padding: 5px 10px;
+  font-size: small;
+  color: green;
+}
+
+.unpublished {
+  border-radius: 10px;
+  font-size: small;
+  background-color: rgb(248, 248, 184);
+  padding: 5px 10px;
+  color: #424242;
+}
+
+.draft {
+  border-radius: 10px;
+  font-size: small;
+  background-color: rgb(231, 229, 229);
+  padding: 5px 10px;
+  color: #555;
+}
+
+.editCopy {
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
+  .edit {
+    margin-right: 15px;
+    margin-left: 30%;
+  }
+}
+
 .productContainer {
-  padding: 20px;
+  margin-top: 20px;
+  margin-left: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,6 +89,7 @@
 }
 
 .pagination {
+  margin-bottom: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,9 +108,10 @@
 }
 
 .paginationRight button {
+  border: 1px solid rgb(207, 207, 207);
   background-color: #ffffff;
   color: rgb(134, 131, 131);
-  border: none;
+
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
@@ -76,7 +119,7 @@
   border-radius: 5px;
 
   &:disabled {
-    background-color: #ccc;
+    background-color: #f3f0f0;
     cursor: not-allowed;
   }
 
@@ -105,11 +148,13 @@
 }
 
 .productHeader {
-  width: 100%;
-  padding: 0 180px;
   display: flex;
-  justify-content: end;
-  margin-top: 15px;
+  justify-content: space-between;
+
+  margin-right: 10px;
+  margin-left: 15px;
+  padding-top: 15px;
+  background-color: #fff;
 
   button {
     background-color: #5556a6;
@@ -119,5 +164,80 @@
     color: white;
     margin-right: 5px;
     font-weight: 400;
+  }
+
+  .filterHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .leftControls {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rightControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .filterButton {
+    display: flex;
+    background-color: #ffffff;
+    color: #555;
+    border: 1px solid #c2c2c2;
+    gap: 5px;
+
+    img {
+      margin-top: 2px;
+    }
+  }
+}
+
+.add {
+  margin-top: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 0 165px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+
+  .addButton {
+    background-color: #5556a6;
+    margin-right: 5px;
+    padding: 10px 15px;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 82px;
+  }
+
+  .navigator {
+    display: flex;
+
+    .arrow {
+      margin-left: 10px;
+      margin-top: 2px;
+    }
+
+    .productMaster {
+      color: #5556a6;
+      margin-top: 7px;
+      margin-left: 10px;
+      font-size: 15px;
+      font-weight: 400;
+    }
   }
 }

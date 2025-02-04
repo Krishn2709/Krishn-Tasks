@@ -4,6 +4,20 @@ const initialState = {
   products: [],
   loading: false,
   error: null,
+  filters: {
+    searchText: "",
+    searchField: "product_code",
+    isAssured: "",
+    isRefrigerated: "",
+    status: "",
+    manufacturer: "",
+    combination: "",
+    showFilters: false,
+  },
+  sorting: {
+    field: "ws_code",
+    direction: "d",
+  },
   pagination: {
     currentPage: 1,
     perPage: 10,
@@ -11,6 +25,10 @@ const initialState = {
     total: 0,
     currentPageRecord: 0,
   },
+  manufacturers: [],
+  molecules: [],
+  loadingManufacturers: false,
+  loadingMolecules: false,
 };
 
 const productSlice = createSlice({
@@ -18,19 +36,15 @@ const productSlice = createSlice({
   initialState,
   reducers: {
     fetchProductsRequest: (state, action) => {
-      console.log("hi there : ", action.payload);
       state.loading = true;
       state.error = null;
-
       if (action.payload) {
         state.pagination.currentPage = action.payload;
       }
     },
     fetchProductsSuccess: (state, action) => {
-      console.log("Products Fetched:", action.payload);
       state.loading = false;
       state.products = action.payload.products ?? [];
-
       if (action.payload.meta) {
         state.pagination = {
           currentPage:
@@ -49,6 +63,40 @@ const productSlice = createSlice({
       state.error =
         action.payload || "An error occurred while fetching products";
     },
+    setSearchFilter: (state, action) => {
+      state.filters.searchText = action.payload.searchText;
+      state.filters.searchField = action.payload.searchField;
+    },
+    setFilter: (state, action) => {
+      state.filters[action.payload.key] = action.payload.value;
+    },
+    toggleFilters: (state) => {
+      state.filters.showFilters = !state.filters.showFilters;
+    },
+    clearFilters: (state) => {
+      state.filters = {
+        ...initialState.filters,
+        showFilters: state.filters.showFilters,
+      };
+    },
+    setSorting: (state, action) => {
+      state.sorting = action.payload;
+    },
+
+    searchManufacturers: (state, action) => {
+      state.loadingManufacturers = true;
+    },
+    searchMolecules: (state, action) => {
+      state.loadingMolecules = true;
+    },
+    fetchManufacturersSuccess: (state, action) => {
+      state.manufacturers = action.payload;
+      state.loadingManufacturers = false;
+    },
+    fetchMoleculesSuccess: (state, action) => {
+      state.molecules = action.payload;
+      state.loadingMolecules = false;
+    },
     setCurrentPage: (state, action) => {
       state.pagination.currentPage = action.payload;
     },
@@ -59,6 +107,15 @@ export const {
   fetchProductsRequest,
   fetchProductsSuccess,
   fetchProductsFailure,
+  setSearchFilter,
+  setFilter,
+  toggleFilters,
+  clearFilters,
+  setSorting,
+  searchManufacturers,
+  searchMolecules,
+  fetchManufacturersSuccess,
+  fetchMoleculesSuccess,
   setCurrentPage,
 } = productSlice.actions;
 

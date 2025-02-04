@@ -9,49 +9,88 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProductsRequest,
   setCurrentPage,
+  setSearchFilter,
+  setFilter,
+  toggleFilters,
+  clearFilters,
+  setSorting,
+  fetchManufacturersRequest,
+  fetchMoleculesRequest,
 } from "../../redux/slices/productSlice";
+import {
+  SearchField,
+  FilterDropdowns,
+  SortByDropdown,
+} from "../../components/ProductFilter";
 
-const page = () => {
+const Page = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  console.log("Component mounted");
   const isAuthenticated = localStorage.getItem("token");
-  const { products, loading, error, pagination } = useSelector((state) => {
-    console.log("Redux State:", state);
-    return state.products;
-  });
+
+  const {
+    products,
+    loading,
+    error,
+    pagination,
+    filters,
+    sorting,
+    manufacturers,
+    molecules,
+  } = useSelector((state) => state.products);
 
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(fetchProductsRequest(pagination.currentPage));
+      dispatch(fetchProductsRequest());
     } else {
       router.push("/login");
     }
-  }, [dispatch, pagination.currentPage, isAuthenticated]);
+  }, [dispatch, pagination.currentPage, isAuthenticated, filters, sorting]);
 
-  const handlePageChange = (page) => {
-    dispatch(setCurrentPage(page));
+  const handleSearchChange = (text) => {
+    dispatch(
+      setSearchFilter({ searchText: text, searchField: filters.searchField })
+    );
+  };
+
+  const handleSearchFieldChange = (field) => {
+    dispatch(
+      setSearchFilter({ searchText: filters.searchText, searchField: field })
+    );
+  };
+
+  const handleFilterChange = (key, value) => {
+    dispatch(setFilter({ key, value }));
+  };
+
+  const handleManufacturerClick = () => {
+    if (manufacturers.length === 0) {
+      dispatch(fetchManufacturersRequest());
+    }
+  };
+
+  const handleMoleculeClick = () => {
+    if (molecules.length === 0) {
+      dispatch(fetchMoleculesRequest());
+    }
+  };
+
+  const handleClearFilters = () => {
+    dispatch(clearFilters());
   };
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) {
-    router.push("/login");
+    console.log(error);
   }
 
-  // Check if pagination values are available, if not, set fallback values
-  const totalProducts = pagination.totalProducts || 0;
-  const productsPerPage = pagination.productsPerPage || 10; // Default to 10 if not provided
-
+  const productsPerPage = pagination.perPage || 10;
   const startProduct = (pagination.currentPage - 1) * productsPerPage + 1;
-  const endProduct = Math.min(
-    pagination.currentPage * productsPerPage,
-    totalProducts
-  );
-
-  // Generate the range of pages to display
+  const endProduct = startProduct + productsPerPage - 1;
+  const totalProducts = pagination.total;
   const pageNumbers = [];
-  const pageRange = 2; // Number of pages before and after the current page
-  const totalPages = pagination.lastPage || 1; // Default to 1 page if not defined
+  const pageRange = 2;
+  const totalPages = pagination.lastPage || 1;
 
   for (
     let i = Math.max(1, pagination.currentPage - pageRange);
@@ -64,67 +103,147 @@ const page = () => {
   return (
     <>
       <Navbar />
-      <div className={styles.productHeader}>
-        <button> + Add</button>
+      <div className={styles.add}>
+        <div className={styles.navigator}>
+          <img
+            src="https://stage.mkwms.dev/assets/home_breadcrumb.svg"
+            alt="Masters Icon"
+            width="22"
+            height="22"
+            className={styles.HoSvg}
+          />
+          <img
+            src="https://stage.mkwms.dev/assets/breadcrumb_arrow.svg"
+            alt="Masters Icon"
+            width="8"
+            height="8"
+            className={styles.arrow}
+          />
+          <div className={styles.productMaster}>Product Master</div>
+        </div>
+        <div>
+          <button className={styles.addButton}>+ Add</button>
+        </div>
       </div>
-      <div className={styles.productContainer}>
-        <ProductList products={products} />
+      <div className={styles.parentContainer}>
+        <div className={styles.mainContainer}>
+          <div className={styles.productHeader}>
+            <div className={styles.leftControls}>
+              <SearchField
+                searchText={filters.searchText}
+                searchField={filters.searchField}
+                onSearchChange={handleSearchChange}
+                onFieldChange={handleSearchFieldChange}
+              />
+            </div>
+            <div className={styles.rightControls}>
+              <div>
+                <button
+                  className={styles.filterButton}
+                  onClick={() => dispatch(toggleFilters())}
+                >
+                  <img
+                    src="https://stage.mkwms.dev/assets/table/filterIcon.svg"
+                    alt="Masters Icon"
+                    width="20"
+                    height="20"
+                    className={styles.navSvg}
+                  />
+                  {filters.showFilters ? "Hide Filters" : "Filter"}
+                </button>
+              </div>
 
-        <div className={styles.pagination}>
-          <div className={styles.paginationLeft}>
-            Showing {startProduct} to {endProduct} of {totalProducts}
+              <SortByDropdown
+                sorting={sorting}
+                onSortChange={(sort) => dispatch(setSorting(sort))}
+              />
+            </div>
+
+            {filters.showFilters && (
+              <div className={styles.filterSection}>
+                <FilterDropdowns
+                  filters={filters}
+                  manufacturers={manufacturers}
+                  molecules={molecules}
+                  onFilterChange={handleFilterChange}
+                  onManufacturerClick={handleManufacturerClick}
+                  onMoleculeClick={handleMoleculeClick}
+                />
+                <button
+                  className={styles.clearFiltersButton}
+                  onClick={handleClearFilters}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className={styles.paginationRight}>
-            <button
-              disabled={pagination.currentPage === 1}
-              onClick={() => handlePageChange(pagination.currentPage - 1)}
-            >
-              Previous
-            </button>
+          <div className={styles.productContainer}>
+            <ProductList products={products} />
 
-            {pagination.currentPage > pageRange + 1 && (
-              <>
-                <span
-                  className={styles.pageNumber}
-                  onClick={() => handlePageChange(1)}
+            <div className={styles.pagination}>
+              <div className={styles.paginationLeft}>
+                Showing {startProduct} to {Math.min(endProduct, totalProducts)}{" "}
+                of {totalProducts}
+              </div>
+
+              <div className={styles.paginationRight}>
+                <button
+                  disabled={pagination.currentPage === 1}
+                  onClick={() =>
+                    dispatch(setCurrentPage(pagination.currentPage - 1))
+                  }
                 >
-                  1
-                </span>
-                <span>...</span>
-              </>
-            )}
+                  Previous
+                </button>
 
-            {pageNumbers.map((page) => (
-              <span
-                key={page}
-                className={`${styles.pageNumber} ${
-                  page === pagination.currentPage ? styles.active : ""
-                }`}
-                onClick={() => handlePageChange(page)}
-              >
-                {page}
-              </span>
-            ))}
+                {pagination.currentPage > pageRange + 1 && (
+                  <>
+                    <span
+                      className={styles.pageNumber}
+                      onClick={() => dispatch(setCurrentPage(1))}
+                    >
+                      1
+                    </span>
+                    <span>...</span>
+                  </>
+                )}
 
-            {pagination.currentPage < totalPages - pageRange && (
-              <>
-                <span>...</span>
-                <span
-                  className={styles.pageNumber}
-                  onClick={() => handlePageChange(totalPages)}
+                {pageNumbers.map((page) => (
+                  <span
+                    key={page}
+                    className={`${styles.pageNumber} ${
+                      page === pagination.currentPage ? styles.active : ""
+                    }`}
+                    onClick={() => dispatch(setCurrentPage(page))}
+                  >
+                    {page}
+                  </span>
+                ))}
+
+                {pagination.currentPage < totalPages - pageRange && (
+                  <>
+                    <span>...</span>
+                    <span
+                      className={styles.pageNumber}
+                      onClick={() => dispatch(setCurrentPage(totalPages))}
+                    >
+                      {totalPages}
+                    </span>
+                  </>
+                )}
+
+                <button
+                  disabled={pagination.currentPage === totalPages}
+                  onClick={() =>
+                    dispatch(setCurrentPage(pagination.currentPage + 1))
+                  }
                 >
-                  {totalPages}
-                </span>
-              </>
-            )}
-
-            <button
-              disabled={pagination.currentPage === totalPages}
-              onClick={() => handlePageChange(pagination.currentPage + 1)}
-            >
-              Next
-            </button>
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -132,4 +251,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

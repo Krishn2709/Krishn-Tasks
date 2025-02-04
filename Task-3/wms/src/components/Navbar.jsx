@@ -50,8 +50,24 @@ const Header = () => {
           <button className={styles.createButton}>Create</button>
         </div>
         <div className={styles.headerTopRight}>
+          <div className={styles.HOicon}>
+            HO
+            <img
+              src="https://stage.mkwms.dev/assets/navbar-menu/dropdown-arrow.svg"
+              alt="Masters Icon"
+              width="12"
+              height="12"
+              className={styles.HoSvg}
+            />
+          </div>
+          <img
+            src="https://stage.mkwms.dev/assets/navbar-menu/notification-bell.svg"
+            alt="Masters Icon"
+            width="24"
+            height="24"
+          />
           <button className={styles.logoutButton} onClick={handleLogout}>
-            Logout
+            kP
           </button>
         </div>
       </div>
