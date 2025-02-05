@@ -29,6 +29,11 @@ const initialState = {
   molecules: [],
   loadingManufacturers: false,
   loadingMolecules: false,
+  lastFetchTimestamp: null,
+  cache: {
+    queries: {},
+    ttl: 5 * 60 * 1000,
+  },
 };
 
 const productSlice = createSlice({
@@ -38,9 +43,10 @@ const productSlice = createSlice({
     fetchProductsRequest: (state, action) => {
       state.loading = true;
       state.error = null;
-      if (action.payload) {
-        state.pagination.currentPage = action.payload;
+      if (action.payload?.page) {
+        state.pagination.currentPage = action.payload.page;
       }
+      state.lastFetchTimestamp = Date.now();
     },
     fetchProductsSuccess: (state, action) => {
       state.loading = false;
@@ -57,6 +63,16 @@ const productSlice = createSlice({
             state.pagination.currentPageRecord,
         };
       }
+
+      const cacheKey = JSON.stringify({
+        page: state.pagination.currentPage,
+        filters: state.filters,
+        sorting: state.sorting,
+      });
+      state.cache.queries[cacheKey] = {
+        data: action.payload,
+        timestamp: Date.now(),
+      };
     },
     fetchProductsFailure: (state, action) => {
       state.loading = false;
@@ -66,9 +82,11 @@ const productSlice = createSlice({
     setSearchFilter: (state, action) => {
       state.filters.searchText = action.payload.searchText;
       state.filters.searchField = action.payload.searchField;
+      state.pagination.currentPage = 1;
     },
     setFilter: (state, action) => {
       state.filters[action.payload.key] = action.payload.value;
+      state.pagination.currentPage = 1;
     },
     toggleFilters: (state) => {
       state.filters.showFilters = !state.filters.showFilters;
@@ -78,16 +96,21 @@ const productSlice = createSlice({
         ...initialState.filters,
         showFilters: state.filters.showFilters,
       };
+      state.pagination.currentPage = 1;
     },
     setSorting: (state, action) => {
       state.sorting = action.payload;
+      state.pagination.currentPage = 1;
     },
-
-    searchManufacturers: (state, action) => {
-      state.loadingManufacturers = true;
+    searchManufacturers: (state) => {
+      if (!state.loadingManufacturers) {
+        state.loadingManufacturers = true;
+      }
     },
-    searchMolecules: (state, action) => {
-      state.loadingMolecules = true;
+    searchMolecules: (state) => {
+      if (!state.loadingMolecules) {
+        state.loadingMolecules = true;
+      }
     },
     fetchManufacturersSuccess: (state, action) => {
       state.manufacturers = action.payload;
@@ -99,6 +122,9 @@ const productSlice = createSlice({
     },
     setCurrentPage: (state, action) => {
       state.pagination.currentPage = action.payload;
+    },
+    clearCache: (state) => {
+      state.cache.queries = {};
     },
   },
 });
@@ -117,6 +143,7 @@ export const {
   fetchManufacturersSuccess,
   fetchMoleculesSuccess,
   setCurrentPage,
+  clearCache,
 } = productSlice.actions;
 
 export default productSlice.reducer;

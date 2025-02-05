@@ -1,0 +1,28 @@
+.navigator {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.homeIcon {
+  margin-right: 5px;
+}
+
+.arrow {
+  margin: 0 10px;
+}
+
+.breadcrumbLink {
+  color: #666;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 400;
+
+  &:hover {
+    color: #5556a6;
+  }
+
+  &.active {
+    color: #5556a6;
+  }
+}

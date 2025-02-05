@@ -1,0 +1,49 @@
+.productContainer {
+  margin-top: 20px;
+  margin-left: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.productTable {
+  width: 100%;
+  max-width: 1550px;
+  height: 400px;
+  overflow: hidden;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  table-layout: fixed;
+
+  thead {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+  }
+
+  th,
+  td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  tbody tr {
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #f1f1f1;
+    }
+  }
+
+  td {
+    max-width: 200px;
+  }
+
+  th {
+    background-color: #e0e0e0;
+  }
+}

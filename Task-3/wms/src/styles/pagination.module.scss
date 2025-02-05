@@ -1,0 +1,79 @@
+.pagination {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1550px;
+}
+
+.paginationLeft {
+  font-size: 14px;
+  color: #555;
+}
+
+.paginationRight {
+  display: flex;
+  align-items: center;
+
+  button {
+    border: 1px solid rgb(207, 207, 207);
+    background-color: #ffffff;
+    color: rgb(134, 131, 131);
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+    border-radius: 5px;
+
+    &:disabled {
+      background-color: #f3f0f0;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: #5556a6;
+      color: white;
+    }
+  }
+}
+
+.pageNumber {
+  cursor: pointer;
+  padding: 8px 15px;
+  font-size: 14px;
+  margin: 0 5px;
+  border-radius: 5px;
+
+  &.active {
+    background-color: #5556a6;
+    color: rgb(255, 255, 255);
+  }
+
+  &:hover {
+    background-color: #5556a6;
+    color: white;
+  }
+}
+
+.loaderContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: #5556a6;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

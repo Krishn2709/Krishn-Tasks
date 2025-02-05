@@ -1,11 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import debounce from "lodash/debounce";
 import Navbar from "../../components/Navbar";
 import styles from "../../styles/product-master.module.scss";
 import ProductList from "@/components/ProductList";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { FilterDropdowns } from "@/components/FilterDropdowns";
+import { SearchField } from "@/components/SearchField";
+import { SortByDropdown } from "@/components/SortByDropdown";
+import { Pagination } from "@/components/Pagination";
+import Navigator from "@/components/Navigator";
+import Spinner from "@/components/Spinner";
 import {
   fetchProductsRequest,
   setCurrentPage,
@@ -14,14 +21,9 @@ import {
   toggleFilters,
   clearFilters,
   setSorting,
-  fetchManufacturersRequest,
-  fetchMoleculesRequest,
+  searchManufacturers,
+  searchMolecules,
 } from "../../redux/slices/productSlice";
-import {
-  SearchField,
-  FilterDropdowns,
-  SortByDropdown,
-} from "../../components/ProductFilter";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -39,90 +41,104 @@ const Page = () => {
     molecules,
   } = useSelector((state) => state.products);
 
+  const queryParams = useMemo(
+    () => ({
+      page: pagination.currentPage,
+      filters,
+      sorting,
+    }),
+    [pagination.currentPage, filters, sorting]
+  );
+
+  const debouncedSearch = useCallback(
+    debounce((text, field) => {
+      dispatch(setSearchFilter({ searchText: text, searchField: field }));
+    }, 100),
+    [dispatch]
+  );
+
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchProductsRequest());
-    } else {
+    if (!isAuthenticated) {
       router.push("/login");
+      return;
     }
-  }, [dispatch, pagination.currentPage, isAuthenticated, filters, sorting]);
+    dispatch(fetchProductsRequest());
+  }, [dispatch, isAuthenticated, queryParams]);
 
   const handleSearchChange = (text) => {
-    dispatch(
-      setSearchFilter({ searchText: text, searchField: filters.searchField })
-    );
+    debouncedSearch(text, filters.searchField);
   };
 
   const handleSearchFieldChange = (field) => {
-    dispatch(
-      setSearchFilter({ searchText: filters.searchText, searchField: field })
-    );
+    debouncedSearch(filters.searchText, field);
   };
 
-  const handleFilterChange = (key, value) => {
-    dispatch(setFilter({ key, value }));
-  };
+  const handleFilterChange = useCallback(
+    (key, value) => {
+      dispatch(setFilter({ key, value }));
+    },
+    [dispatch]
+  );
 
-  const handleManufacturerClick = () => {
+  const handleManufacturerClick = useCallback(() => {
     if (manufacturers.length === 0) {
-      dispatch(fetchManufacturersRequest());
+      dispatch(searchManufacturers());
     }
-  };
+  }, [dispatch, manufacturers.length]);
 
-  const handleMoleculeClick = () => {
+  const handleMoleculeClick = useCallback(() => {
     if (molecules.length === 0) {
-      dispatch(fetchMoleculesRequest());
+      dispatch(searchMolecules());
     }
-  };
+  }, [dispatch, molecules.length]);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     dispatch(clearFilters());
-  };
+  }, [dispatch]);
 
-  if (loading) return <div className="loading">Loading...</div>;
+  const handleSortChange = useCallback(
+    (sort) => {
+      dispatch(setSorting(sort));
+    },
+    [dispatch]
+  );
+
+  const handlePageChange = useCallback(
+    (page) => {
+      dispatch(setCurrentPage(page));
+    },
+    [dispatch]
+  );
+
+  if (loading && !products.length)
+    return (
+      <div className="loading">
+        <Spinner size="medium" color="#5556a6" />
+      </div>
+    );
   if (error) {
-    console.log(error);
+    console.error(error);
   }
+  const searchFields = [
+    { value: "product_code", label: "Product Code" },
+    { value: "ws_code", label: "Wondersoft Code" },
+    { value: "name", label: "Product Name" },
+    { value: "manufacturer", label: "Manufacturer" },
+  ];
 
-  const productsPerPage = pagination.perPage || 10;
-  const startProduct = (pagination.currentPage - 1) * productsPerPage + 1;
-  const endProduct = startProduct + productsPerPage - 1;
-  const totalProducts = pagination.total;
-  const pageNumbers = [];
-  const pageRange = 2;
-  const totalPages = pagination.lastPage || 1;
-
-  for (
-    let i = Math.max(1, pagination.currentPage - pageRange);
-    i <= Math.min(totalPages, pagination.currentPage + pageRange);
-    i++
-  ) {
-    pageNumbers.push(i);
-  }
+  const handleAddProduct = () => {
+    router.push("/product-master/add-product");
+  };
 
   return (
     <>
       <Navbar />
       <div className={styles.add}>
-        <div className={styles.navigator}>
-          <img
-            src="https://stage.mkwms.dev/assets/home_breadcrumb.svg"
-            alt="Masters Icon"
-            width="22"
-            height="22"
-            className={styles.HoSvg}
-          />
-          <img
-            src="https://stage.mkwms.dev/assets/breadcrumb_arrow.svg"
-            alt="Masters Icon"
-            width="8"
-            height="8"
-            className={styles.arrow}
-          />
-          <div className={styles.productMaster}>Product Master</div>
-        </div>
+        <Navigator />
         <div>
-          <button className={styles.addButton}>+ Add</button>
+          <button className={styles.addButton} onClick={handleAddProduct}>
+            + Add
+          </button>
         </div>
       </div>
       <div className={styles.parentContainer}>
@@ -131,10 +147,19 @@ const Page = () => {
             <div className={styles.leftControls}>
               <SearchField
                 searchText={filters.searchText}
-                searchField={filters.searchField}
                 onSearchChange={handleSearchChange}
-                onFieldChange={handleSearchFieldChange}
               />
+              <select
+                value={filters.searchField}
+                onChange={(e) => handleSearchFieldChange(e.target.value)}
+                className={styles.searchSelect}
+              >
+                {searchFields.map((field) => (
+                  <option key={field.value} value={field.value}>
+                    {field.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className={styles.rightControls}>
               <div>
@@ -149,101 +174,46 @@ const Page = () => {
                     height="20"
                     className={styles.navSvg}
                   />
-                  {filters.showFilters ? "Hide Filters" : "Filter"}
+                  Filter
                 </button>
               </div>
 
               <SortByDropdown
                 sorting={sorting}
-                onSortChange={(sort) => dispatch(setSorting(sort))}
+                onSortChange={handleSortChange}
               />
             </div>
-
-            {filters.showFilters && (
-              <div className={styles.filterSection}>
-                <FilterDropdowns
-                  filters={filters}
-                  manufacturers={manufacturers}
-                  molecules={molecules}
-                  onFilterChange={handleFilterChange}
-                  onManufacturerClick={handleManufacturerClick}
-                  onMoleculeClick={handleMoleculeClick}
-                />
-                <button
-                  className={styles.clearFiltersButton}
-                  onClick={handleClearFilters}
-                >
-                  Clear Filters
-                </button>
-              </div>
-            )}
           </div>
+          {filters.showFilters && (
+            <div className={styles.filterSection}>
+              <FilterDropdowns
+                filters={filters}
+                manufacturers={manufacturers}
+                molecules={molecules}
+                onFilterChange={handleFilterChange}
+                onManufacturerClick={handleManufacturerClick}
+                onMoleculeClick={handleMoleculeClick}
+              />
+              <button
+                className={styles.clearFiltersButton}
+                onClick={handleClearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
 
           <div className={styles.productContainer}>
             <ProductList products={products} />
 
-            <div className={styles.pagination}>
-              <div className={styles.paginationLeft}>
-                Showing {startProduct} to {Math.min(endProduct, totalProducts)}{" "}
-                of {totalProducts}
-              </div>
-
-              <div className={styles.paginationRight}>
-                <button
-                  disabled={pagination.currentPage === 1}
-                  onClick={() =>
-                    dispatch(setCurrentPage(pagination.currentPage - 1))
-                  }
-                >
-                  Previous
-                </button>
-
-                {pagination.currentPage > pageRange + 1 && (
-                  <>
-                    <span
-                      className={styles.pageNumber}
-                      onClick={() => dispatch(setCurrentPage(1))}
-                    >
-                      1
-                    </span>
-                    <span>...</span>
-                  </>
-                )}
-
-                {pageNumbers.map((page) => (
-                  <span
-                    key={page}
-                    className={`${styles.pageNumber} ${
-                      page === pagination.currentPage ? styles.active : ""
-                    }`}
-                    onClick={() => dispatch(setCurrentPage(page))}
-                  >
-                    {page}
-                  </span>
-                ))}
-
-                {pagination.currentPage < totalPages - pageRange && (
-                  <>
-                    <span>...</span>
-                    <span
-                      className={styles.pageNumber}
-                      onClick={() => dispatch(setCurrentPage(totalPages))}
-                    >
-                      {totalPages}
-                    </span>
-                  </>
-                )}
-
-                <button
-                  disabled={pagination.currentPage === totalPages}
-                  onClick={() =>
-                    dispatch(setCurrentPage(pagination.currentPage + 1))
-                  }
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.lastPage || 1}
+              totalItems={pagination.total}
+              itemsPerPage={pagination.perPage || 10}
+              onPageChange={handlePageChange}
+              loading={loading}
+            />
           </div>
         </div>
       </div>
