@@ -24,6 +24,8 @@ import {
   searchManufacturers,
   searchMolecules,
 } from "../../redux/slices/productSlice";
+import Dropdown from "@/components/DropDown";
+import tableConfig from "../../data/tableConfig";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -79,18 +81,6 @@ const Page = () => {
     },
     [dispatch]
   );
-
-  const handleManufacturerClick = useCallback(() => {
-    if (manufacturers.length === 0) {
-      dispatch(searchManufacturers());
-    }
-  }, [dispatch, manufacturers.length]);
-
-  const handleMoleculeClick = useCallback(() => {
-    if (molecules.length === 0) {
-      dispatch(searchMolecules());
-    }
-  }, [dispatch, molecules.length]);
 
   const handleClearFilters = useCallback(() => {
     dispatch(clearFilters());
@@ -149,17 +139,11 @@ const Page = () => {
                 searchText={filters.searchText}
                 onSearchChange={handleSearchChange}
               />
-              <select
-                value={filters.searchField}
-                onChange={(e) => handleSearchFieldChange(e.target.value)}
-                className={styles.searchSelect}
-              >
-                {searchFields.map((field) => (
-                  <option key={field.value} value={field.value}>
-                    {field.label}
-                  </option>
-                ))}
-              </select>
+              <Dropdown
+                options={searchFields}
+                selectedValue={filters.searchField}
+                onChange={handleSearchFieldChange}
+              />
             </div>
             <div className={styles.rightControls}>
               <div>
@@ -191,8 +175,6 @@ const Page = () => {
                 manufacturers={manufacturers}
                 molecules={molecules}
                 onFilterChange={handleFilterChange}
-                onManufacturerClick={handleManufacturerClick}
-                onMoleculeClick={handleMoleculeClick}
               />
               <button
                 className={styles.clearFiltersButton}
@@ -204,7 +186,7 @@ const Page = () => {
           )}
 
           <div className={styles.productContainer}>
-            <ProductList products={products} />
+            <ProductList products={products} tableConfig={tableConfig} />
 
             <Pagination
               currentPage={pagination.currentPage}

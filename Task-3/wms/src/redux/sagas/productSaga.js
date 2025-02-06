@@ -1,5 +1,5 @@
 import { takeLatest, put, call, select } from "redux-saga/effects";
-import api from "@/utils/api";
+import { apiMethods } from "../../utils/api";
 import {
   fetchProductsRequest,
   fetchProductsSuccess,
@@ -10,38 +10,17 @@ import {
   searchMolecules,
 } from "../slices/productSlice";
 
-// Helper to build URL with filters
-const buildFilterUrl = (state) => {
-  const { filters, sorting, pagination } = state.products;
-  let url = `/api/v1/master/products/unpublished?sort_by=${sorting.field},${sorting.direction}&page=${pagination.currentPage}`;
-
-  if (filters.searchText) {
-    url += `&search=${filters.searchText},${filters.searchField}`;
-  }
-  if (filters.isAssured) {
-    url += `&is_assured=${filters.isAssured}`;
-  }
-  if (filters.isRefrigerated) {
-    url += `&is_refrigerated=${filters.isRefrigerated}`;
-  }
-  if (filters.status) {
-    url += `&publish_status=${filters.status}`;
-  }
-  if (filters.manufacturer) {
-    url += `&manufacturer=${filters.manufacturer}`;
-  }
-  if (filters.combination) {
-    url += `&combination=${filters.combination}`;
-  }
-
-  return url;
-};
-
 function* fetchProductsSaga() {
   try {
     const state = yield select();
-    const url = buildFilterUrl(state);
-    const response = yield call(api.get, url);
+    const { filters, sorting, pagination } = state.products;
+
+    const response = yield call(
+      apiMethods.products.fetchUnpublished,
+      filters,
+      sorting,
+      pagination
+    );
 
     if (response.data.code === 200) {
       yield put(fetchProductsSuccess(response.data));
@@ -60,10 +39,13 @@ function* fetchProductsSaga() {
 }
 
 function* searchManufacturersSaga(action) {
+  console.log(action.payload);
+  console.log(apiMethods.manufacturers.search);
+
   try {
     const response = yield call(
-      api.get,
-      `/api/v1/master/manufacturers?search=${action.payload},name`
+      apiMethods.manufacturers.list
+      // action.payload.searchText
     );
     if (response.data.code === 200) {
       yield put(fetchManufacturersSuccess(response.data.manufacturers));
@@ -76,8 +58,8 @@ function* searchManufacturersSaga(action) {
 function* searchMoleculesSaga(action) {
   try {
     const response = yield call(
-      api.get,
-      `/api/v1/master/molecules?search=${action.payload},name`
+      apiMethods.molecules.list
+      // action.payload.searchText
     );
     if (response.data.code === 200) {
       yield put(fetchMoleculesSuccess(response.data.molecules));

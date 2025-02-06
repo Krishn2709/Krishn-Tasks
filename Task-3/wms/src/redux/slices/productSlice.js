@@ -6,6 +6,8 @@ const initialState = {
   error: null,
   filters: {
     searchText: "",
+    searchManufacturer: "",
+    searchMolecule: "",
     searchField: "product_code",
     isAssured: "",
     isRefrigerated: "",
@@ -102,12 +104,12 @@ const productSlice = createSlice({
       state.sorting = action.payload;
       state.pagination.currentPage = 1;
     },
-    searchManufacturers: (state) => {
+    searchManufacturers: (state, action) => {
       if (!state.loadingManufacturers) {
         state.loadingManufacturers = true;
       }
     },
-    searchMolecules: (state) => {
+    searchMolecules: (state, action) => {
       if (!state.loadingMolecules) {
         state.loadingMolecules = true;
       }
