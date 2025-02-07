@@ -108,6 +108,7 @@ const Page = () => {
     );
   if (error) {
     console.error(error);
+    router.push("/login");
   }
   const searchFields = [
     { value: "product_code", label: "Product Code" },
@@ -118,6 +119,12 @@ const Page = () => {
 
   const handleAddProduct = () => {
     router.push("/product-master/add-product");
+  };
+
+  const handleOnClick = (action, data) => {
+    if (action == "edit") {
+      router.push("/product-master/edit-product/" + data?.product_id);
+    }
   };
 
   return (
@@ -186,7 +193,11 @@ const Page = () => {
           )}
 
           <div className={styles.productContainer}>
-            <ProductList products={products} tableConfig={tableConfig} />
+            <ProductList
+              products={products}
+              tableConfig={tableConfig}
+              handleOnClick={handleOnClick}
+            />
 
             <Pagination
               currentPage={pagination.currentPage}

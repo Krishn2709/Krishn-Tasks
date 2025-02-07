@@ -43,34 +43,20 @@ const tableConfig = {
       name: "action",
       label: "Action",
       isCustom: true,
-      render: (product, styles) => (
-        <>
-          <button
-            className={styles.edit}
-            onClick={() => console.log("Edit clicked for", product)}
-          >
-            <img
-              src="https://stage.mkwms.dev/assets/table/Edit-button.svg"
-              alt="Edit"
-              width="24"
-              height="24"
-              className={styles.navSvg1}
-            />
-          </button>
-          <button
-            className={styles.copy}
-            onClick={() => console.log("Copy clicked for", product)}
-          >
-            <img
-              src="https://stage.mkwms.dev/assets/table/copy-button.svg"
-              alt="Copy"
-              width="24"
-              height="24"
-              className={styles.navSvg1}
-            />
-          </button>
-        </>
-      ),
+      actions: [
+        {
+          fieldKey: "edit",
+          fieldType: "button",
+          imageURL: "https://stage.mkwms.dev/assets/table/Edit-button.svg",
+          altText: "Edit",
+        },
+        {
+          fieldKey: "copy",
+          fieldType: "button",
+          imageURL: "https://stage.mkwms.dev/assets/table/copy-button.svg",
+          altText: "Copy",
+        },
+      ],
     },
   ],
 };

@@ -3,47 +3,69 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import styles from "../styles/Modal.module.scss";
-// import { closeModal } from "@/redux/slices/modalSlice";
+import { productModalConfig } from "../data/addProd";
 
-const DynamicProductModal = ({ modalConfig, initialData }) => {
+const DynamicForm = ({ editProdData, onClose, FieldData }) => {
+  console.log(editProdData);
+
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialData || {});
+  const [productType, setProductType] = useState(
+    productModalConfig.defaultProductType
+  );
   const [activeTab, setActiveTab] = useState(
-    modalConfig?.sections[2]?.default || ""
+    productModalConfig.productTypes[productModalConfig.defaultProductType]
+      .sections[2].default
   );
 
+  const config = productModalConfig.productTypes[productType];
+
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
+    if (editProdData) {
+      setFormData(editProdData);
+      if (editProdData["Product Type"]) {
+        setProductType(editProdData["Product Type"]);
+      }
     }
-  }, [initialData]);
+  }, [editProdData]);
 
   const handleChange = (e, field) => {
-    setFormData({ ...formData, [field.label]: e.target.value });
+    const value = e.target.value;
+    setFormData({ ...formData, [field.label]: value });
+
+    if (field.label === "Product Type") {
+      const newType = value;
+      setProductType(newType);
+      const newConfig = productModalConfig.productTypes[newType];
+      setActiveTab(newConfig.sections[2].default);
+    }
   };
 
-  // const handleSubmit = () => {
-  //   console.log("Submitting data:", formData);
-  //   dispatch(closeModal());
-  // };
+  const getOptions = (field) => {
+    if (Array.isArray(field.options)) return field.options;
+    if (
+      typeof field.options === "string" &&
+      Array.isArray(FieldData[field.options])
+    ) {
+      return FieldData[field.options];
+    }
+    return [];
+  };
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContainer}>
         {/* Header */}
         <div className={styles.modalHeader}>
-          <h2>{modalConfig?.sections[0]?.fields[0]?.label || "Modal Title"}</h2>
-          <button
-            className={styles.closeButton}
-            onClick={() => dispatch(closeModal())}
-          >
+          <h1>{config.sections[0].fields[0].label}</h1>
+          <button className={styles.closeButton} onClick={onClose}>
             ✕
           </button>
         </div>
 
         {/* Basic Details */}
         <div className={styles.formGroup}>
-          {modalConfig?.sections[1]?.fields.map((field, index) => (
+          {config.sections[1].fields.map((field, index) => (
             <div key={index} className={styles.inputGroup}>
               <label>{field.label}</label>
               {field.type === "text" || field.type === "number" ? (
@@ -52,25 +74,23 @@ const DynamicProductModal = ({ modalConfig, initialData }) => {
                   value={formData[field.label] || ""}
                   onChange={(e) => handleChange(e, field)}
                   disabled={field.disabled}
+                  required={field.required}
                   className={styles.inputField}
+                  placeholder={field.label}
                 />
               ) : field.type === "dropdown" ? (
                 <select
                   value={formData[field.label] || ""}
                   onChange={(e) => handleChange(e, field)}
+                  required={field.required}
                   className={styles.inputField}
                 >
-                  {Array.isArray(field.options) ? (
-                    field.options.map((option, i) => (
-                      <option key={i} value={option}>
-                        {option}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No options available
+                  <option value="">Select {field.label}</option>
+                  {getOptions(field).map((option, i) => (
+                    <option key={i} value={option}>
+                      {option}
                     </option>
-                  )}
+                  ))}
                 </select>
               ) : null}
             </div>
@@ -79,7 +99,7 @@ const DynamicProductModal = ({ modalConfig, initialData }) => {
 
         {/* Tabs */}
         <div className={styles.tabs}>
-          {modalConfig?.sections[2]?.tabs?.map((tab) => (
+          {config.sections[2].tabs.map((tab) => (
             <button
               key={tab}
               className={`${styles.tabButton} ${
@@ -94,7 +114,7 @@ const DynamicProductModal = ({ modalConfig, initialData }) => {
 
         {/* Tab Content */}
         <div className={styles.formGroup}>
-          {modalConfig?.sections[3]?.fields[activeTab]?.map((field, index) => (
+          {config.sections[3].fields[activeTab]?.map((field, index) => (
             <div key={index} className={styles.inputGroup}>
               <label>{field.label}</label>
               {field.type === "text" || field.type === "number" ? (
@@ -103,25 +123,24 @@ const DynamicProductModal = ({ modalConfig, initialData }) => {
                   value={formData[field.label] || ""}
                   onChange={(e) => handleChange(e, field)}
                   disabled={field.disabled}
+                  required={field.required}
                   className={styles.inputField}
+                  placeholder={field.label}
                 />
               ) : field.type === "dropdown" ? (
                 <select
                   value={formData[field.label] || ""}
                   onChange={(e) => handleChange(e, field)}
+                  disabled={field.disabled}
+                  required={field.required}
                   className={styles.inputField}
                 >
-                  {Array.isArray(field.options) ? (
-                    field.options.map((option, i) => (
-                      <option key={i} value={option}>
-                        {option}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No options available
+                  <option value="">Select {field.label}</option>
+                  {getOptions(field).map((option, i) => (
+                    <option key={i} value={option}>
+                      {option}
                     </option>
-                  )}
+                  ))}
                 </select>
               ) : null}
             </div>
@@ -129,13 +148,11 @@ const DynamicProductModal = ({ modalConfig, initialData }) => {
         </div>
 
         <div className={styles.modalFooter}>
-          <button className={styles.saveButton} /* onClick={handleSubmit} */>
-            Save
-          </button>
+          <button className={styles.saveButton}>Save</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default DynamicProductModal;
+export default DynamicForm;

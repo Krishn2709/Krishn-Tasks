@@ -11,8 +11,10 @@ export const ENDPOINTS = {
   PRODUCTS: {
     UNPUBLISHED: `/api/v1/master/products/unpublished`,
     CREATE: `/api/v1/master/products`,
-    UPDATE: (id) => `/api/v1/master/products/${id}`,
+    GET: (id) => `/api/v1/master/products/unpublished/${id}`,
+    UPDATE: (id) => `/api/v1/master/products/unpublished/${id}`,
     DELETE: (id) => `/api/v1/master/products/${id}`,
+    MASTER_DATA: `/api/v1/master-data/productMasterData`,
   },
   MANUFACTURERS: {
     LIST: `/api/v1/master/manufacturers`,
@@ -36,6 +38,7 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Location = `1`;
     }
     return config;
   },
@@ -87,12 +90,14 @@ export const apiMethods = {
   products: {
     fetchUnpublished: (filters, sorting, pagination) =>
       api.get(buildProductFilterUrl(filters, sorting, pagination)),
+    fetchEditUnpublished: (id) => api.get(ENDPOINTS.PRODUCTS.GET(id)),
     create: (data) => api.post(ENDPOINTS.PRODUCTS.CREATE, data),
     update: (id, data) => api.put(ENDPOINTS.PRODUCTS.UPDATE(id), data),
     delete: (id) => api.delete(ENDPOINTS.PRODUCTS.DELETE(id)),
+    masterData: () => api.get(ENDPOINTS.PRODUCTS.MASTER_DATA),
   },
   manufacturers: {
-    search: (query) => api.get(ENDPOINTS.MANUFACTURERS.SEARCH(query)),
+    search: (query) => api.get(ENDPOINTSś.MANUFACTURERS.SEARCH(query)),
     list: () => api.get(ENDPOINTS.MANUFACTURERS.LIST),
   },
   molecules: {
