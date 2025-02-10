@@ -17,10 +17,9 @@ const ProductList = ({ products, tableConfig, handleOnClick }) => {
         {products.map((product) => (
           <tr key={product.product_id}>
             {tableConfig.fields.map((field) => {
-              //checks it he field is custom field
               if (field.isCustom && field.name === "action") {
                 return (
-                  <td key={field.id}>
+                  <td key={field.id} className={styles.actionButtons}>
                     {field.actions.map((action) => (
                       <button
                         key={action.fieldKey}

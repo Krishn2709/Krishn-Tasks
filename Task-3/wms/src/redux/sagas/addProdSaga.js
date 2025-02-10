@@ -13,9 +13,9 @@ import {
   fetchMoleculesSuccess,
   fetchMoleculesFailure,
   searchMolecules,
-  addProduct,
-  addProductSuccess,
-  addProductFailure,
+  submitProductRequest,
+  submitProductSuccess,
+  submitProductFailure,
 } from "../slices/addProdSlice";
 
 // Saga workers
@@ -91,17 +91,13 @@ function* searchMoleculesSaga(action) {
 
 function* addProductSaga(action) {
   try {
-    const response = yield call(apiMethods.products.create, action.payload);
-    if (response.data.code === 200) {
-      yield put(addProductSuccess());
-      // You might want to add a toast notification here
-    } else {
-      yield put(addProductFailure("Failed to add product"));
-    }
+    yield put(submitProductRequest());
+    yield call(apiMethods.products.create, action.payload);
+
+    yield put(submitProductSuccess());
+    // You might want to add a toast notification here
   } catch (error) {
-    yield put(
-      addProductFailure(error.response?.data?.message || "Network error")
-    );
+    yield put(submitProductFailure("Failed to add product"));
   }
 }
 
@@ -112,5 +108,5 @@ export default function* addProductWatcher() {
   yield debounce(300, searchManufacturers.type, searchManufacturersSaga);
   yield takeLatest(fetchMolecules.type, fetchMoleculesSaga);
   yield debounce(300, searchMolecules.type, searchMoleculesSaga);
-  yield takeLatest(addProduct.type, addProductSaga);
+  yield takeLatest(submitProductRequest.type, addProductSaga);
 }

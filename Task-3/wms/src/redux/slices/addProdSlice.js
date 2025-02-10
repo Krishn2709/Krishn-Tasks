@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  product: {},
   productMasterData: {
     product_type: [],
     dosage_form: [],
@@ -93,17 +94,28 @@ const addProductSlice = createSlice({
     },
 
     // Add Product
-    addProduct: (state, action) => {
-      state.loading.addProduct = true;
-      state.error.addProduct = null;
+    setProduct: (state, action) => {
+      state.product = action.payload;
     },
-    addProductSuccess: (state) => {
-      state.loading.addProduct = false;
-      state.error.addProduct = null;
+    updateProductField: (state, action) => {
+      const { field, value } = action.payload;
+      state.product[field] = value;
     },
-    addProductFailure: (state, action) => {
-      state.loading.addProduct = false;
-      state.error.addProduct = action.payload;
+    resetProduct: (state) => {
+      state.product = {};
+      state.loading = false;
+      state.error = null;
+    },
+    submitProductRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    submitProductSuccess: (state) => {
+      state.loading = false;
+    },
+    submitProductFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     },
 
     // Reset state
@@ -123,9 +135,12 @@ export const {
   fetchMoleculesSuccess,
   fetchMoleculesFailure,
   searchMolecules,
-  addProduct,
-  addProductSuccess,
-  addProductFailure,
+  setProduct,
+  updateProductField,
+  resetProduct,
+  submitProductRequest,
+  submitProductSuccess,
+  submitProductFailure,
   resetAddProduct,
 } = addProductSlice.actions;
 

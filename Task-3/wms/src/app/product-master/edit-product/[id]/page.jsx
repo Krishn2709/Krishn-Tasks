@@ -4,14 +4,15 @@ import React, { useEffect, use } from "react";
 import Navigator from "@/components/Navigator";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
-// import DynamicForm from "../../../components/DynamicForm";
+import DynamicForm from "../../../../components/DynamicForm";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProductMasterData } from "../../../../redux/slices/addProdSlice";
 import {
   fetchProductDetails,
   updateProduct,
 } from "../../../../redux/slices/editProdSlice";
-import { styles } from "../../../../styles/addProduct.module.scss";
+import styles from "../../../../styles/addProduct.module.scss";
+import productModalConfig from "../../../../data/addProd";
 
 export default function EditProductPage({ params }) {
   const unwrappedParams = use(params); // Unwrapping the params promise
@@ -40,10 +41,11 @@ export default function EditProductPage({ params }) {
       <div className={styles.mainContainer}>
         <Navigator />
         <DynamicForm
-          modalConfig={modalConfig}
           onClose={onClose}
           FieldData={productMasterData}
           editProdData={productData}
+          productModalConfig={productModalConfig}
+          productMasterData={productMasterData}
         />
       </div>
     </>

@@ -3,22 +3,32 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import styles from "../styles/Modal.module.scss";
-import { productModalConfig } from "../data/addProd";
+import InputField from "./InputField";
 
-const DynamicForm = ({ editProdData, onClose, FieldData }) => {
-  console.log(editProdData);
-
+const DynamicForm = ({
+  productModalConfig,
+  editProdData,
+  onClose,
+  productMasterData,
+  handleSave,
+  manufacturers,
+  molecules,
+}) => {
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState(initialData || {});
-  const [productType, setProductType] = useState(
-    productModalConfig.defaultProductType
-  );
-  const [activeTab, setActiveTab] = useState(
-    productModalConfig.productTypes[productModalConfig.defaultProductType]
-      .sections[2].default
-  );
+  const defaultType = productModalConfig?.defaultProductType || "Goods";
+  const [formData, setFormData] = useState(editProdData || {});
+  const [productType, setProductType] = useState(defaultType);
+  const [activeTab, setActiveTab] = useState("");
+  // console.log("editProdData", editProdData);
 
-  const config = productModalConfig.productTypes[productType];
+  // Get current configuration based on product type
+  const config = productModalConfig?.productTypes?.[productType];
+
+  useEffect(() => {
+    if (config?.sections?.[2]?.default) {
+      setActiveTab(config.sections[2].default);
+    }
+  }, [config]);
 
   useEffect(() => {
     if (editProdData) {
@@ -29,126 +39,82 @@ const DynamicForm = ({ editProdData, onClose, FieldData }) => {
     }
   }, [editProdData]);
 
-  const handleChange = (e, field) => {
+  const handleChangeType = (e, field) => {
     const value = e.target.value;
-    setFormData({ ...formData, [field.label]: value });
+
+    setFormData((prev) => ({ ...prev, [field.label]: value }));
 
     if (field.label === "Product Type") {
       const newType = value;
       setProductType(newType);
-      const newConfig = productModalConfig.productTypes[newType];
-      setActiveTab(newConfig.sections[2].default);
+
+      const newConfig = productModalConfig?.productTypes?.[newType];
+      if (newConfig?.sections?.[2]?.default) {
+        setActiveTab(newConfig.sections[2].default);
+      }
     }
   };
 
-  const getOptions = (field) => {
-    if (Array.isArray(field.options)) return field.options;
-    if (
-      typeof field.options === "string" &&
-      Array.isArray(FieldData[field.options])
-    ) {
-      return FieldData[field.options];
-    }
-    return [];
+  const renderFields = (fields = []) => {
+    return fields.map((field, index) => (
+      <InputField
+        key={`${field.label}-${index}`}
+        label={field.label}
+        type={field.type === "dropdown" ? "select" : field.type}
+        name={field.label}
+        required={field.required}
+        placeholder={field.label}
+        value={formData[field.label] || ""}
+        onChange={(e) => handleChangeType(e, field)}
+        providedOptions={field.options}
+        disabled={field.disabled}
+        productMasterData={productMasterData}
+        editProdData={editProdData}
+        path={field.mapping}
+        manufacturers={manufacturers}
+        molecules={molecules}
+      />
+    ));
   };
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContainer}>
-        {/* Header */}
         <div className={styles.modalHeader}>
-          <h1>{config.sections[0].fields[0].label}</h1>
+          <h1>{config.sections[0]?.fields?.[0]?.label}</h1>
           <button className={styles.closeButton} onClick={onClose}>
-            ✕
+            {config.sections[0]?.fields?.[1]?.label}
           </button>
         </div>
 
-        {/* Basic Details */}
         <div className={styles.formGroup}>
-          {config.sections[1].fields.map((field, index) => (
-            <div key={index} className={styles.inputGroup}>
-              <label>{field.label}</label>
-              {field.type === "text" || field.type === "number" ? (
-                <input
-                  type={field.type}
-                  value={formData[field.label] || ""}
-                  onChange={(e) => handleChange(e, field)}
-                  disabled={field.disabled}
-                  required={field.required}
-                  className={styles.inputField}
-                  placeholder={field.label}
-                />
-              ) : field.type === "dropdown" ? (
-                <select
-                  value={formData[field.label] || ""}
-                  onChange={(e) => handleChange(e, field)}
-                  required={field.required}
-                  className={styles.inputField}
-                >
-                  <option value="">Select {field.label}</option>
-                  {getOptions(field).map((option, i) => (
-                    <option key={i} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : null}
-            </div>
-          ))}
+          {renderFields(config.sections[1]?.fields)}
         </div>
 
-        {/* Tabs */}
-        <div className={styles.tabs}>
-          {config.sections[2].tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`${styles.tabButton} ${
-                activeTab === tab ? styles.activeTab : ""
-              }`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        {config.sections[2]?.tabs && (
+          <div className={styles.tabs}>
+            {config.sections[2].tabs.map((tab) => (
+              <button
+                key={tab}
+                className={`${styles.tabButton} ${
+                  activeTab === tab ? styles.activeTab : ""
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {/* Tab Content */}
         <div className={styles.formGroup}>
-          {config.sections[3].fields[activeTab]?.map((field, index) => (
-            <div key={index} className={styles.inputGroup}>
-              <label>{field.label}</label>
-              {field.type === "text" || field.type === "number" ? (
-                <input
-                  type={field.type}
-                  value={formData[field.label] || ""}
-                  onChange={(e) => handleChange(e, field)}
-                  disabled={field.disabled}
-                  required={field.required}
-                  className={styles.inputField}
-                  placeholder={field.label}
-                />
-              ) : field.type === "dropdown" ? (
-                <select
-                  value={formData[field.label] || ""}
-                  onChange={(e) => handleChange(e, field)}
-                  disabled={field.disabled}
-                  required={field.required}
-                  className={styles.inputField}
-                >
-                  <option value="">Select {field.label}</option>
-                  {getOptions(field).map((option, i) => (
-                    <option key={i} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : null}
-            </div>
-          ))}
+          {renderFields(config.sections[3]?.fields?.[activeTab])}
         </div>
 
         <div className={styles.modalFooter}>
-          <button className={styles.saveButton}>Save</button>
+          <button className={styles.saveButton} onClick={handleSave}>
+            {config.sections[4]?.fields?.[0]?.label}
+          </button>
         </div>
       </div>
     </div>
