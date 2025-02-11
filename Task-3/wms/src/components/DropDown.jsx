@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "../styles/dropdown.module.scss";
+import { SearchField } from "./SearchField";
 
 const Dropdown = ({ options, selectedValue, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +51,6 @@ const Dropdown = ({ options, selectedValue, onChange }) => {
             </svg>
           )}
         </span>{" "}
-        {/* Arrow */}
       </div>
       {isOpen && (
         <ul className={styles.options}>

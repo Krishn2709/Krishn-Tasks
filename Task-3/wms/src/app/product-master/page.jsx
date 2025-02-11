@@ -43,12 +43,13 @@ const Page = () => {
     molecules,
   } = useSelector((state) => state.products);
 
-  const queryParams = useMemo(
-    () => ({
-      page: pagination.currentPage,
-      filters,
-      sorting,
-    }),
+  const queryParamsString = useMemo(
+    () =>
+      JSON.stringify({
+        page: pagination.currentPage,
+        filters,
+        sorting,
+      }),
     [pagination.currentPage, filters, sorting]
   );
 
@@ -65,7 +66,7 @@ const Page = () => {
       return;
     }
     dispatch(fetchProductsRequest());
-  }, [dispatch, isAuthenticated, queryParams]);
+  }, [dispatch, isAuthenticated, queryParamsString]);
 
   const handleSearchChange = (text) => {
     debouncedSearch(text, filters.searchField);
