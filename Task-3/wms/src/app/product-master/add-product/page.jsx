@@ -32,8 +32,6 @@ export default function Page() {
   const { manufacturers, molecules } = useSelector((state) => state.products);
   const { productMasterData } = useSelector((state) => state.productMasterData);
   const { b2cProducts } = useSelector((state) => state.addProduct);
-  console.log("b2cProducts", b2cProducts);
-  console.log("manu", manufacturers);
 
   const router = useRouter();
   const onClose = () => {

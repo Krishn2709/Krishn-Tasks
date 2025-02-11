@@ -13,6 +13,11 @@ import {
 } from "../../../../redux/slices/editProdSlice";
 import styles from "../../../../styles/addProduct.module.scss";
 import productModalConfig from "../../../../data/editProd";
+import {
+  searchManufacturers,
+  searchMolecules,
+} from "@/redux/slices/productSlice";
+import { fetchB2CProducts } from "../../../../redux/slices/addProdSlice";
 
 export default function EditProductPage({ params }) {
   const unwrappedParams = use(params); // Unwrapping the params promise
@@ -23,10 +28,15 @@ export default function EditProductPage({ params }) {
   useEffect(() => {
     dispatch(fetchProductMasterData());
     dispatch(fetchProductDetails(id));
+    dispatch(searchManufacturers());
+    dispatch(searchMolecules());
+    dispatch(fetchB2CProducts());
   }, [id, dispatch]);
 
   const { productMasterData } = useSelector((state) => state.productMasterData);
   const { productData } = useSelector((state) => state.editProduct);
+  const { manufacturers, molecules } = useSelector((state) => state.products);
+  const { b2cProducts } = useSelector((state) => state.addProduct);
 
   const handleSave = async (formData) => {
     const transformedData = {
@@ -38,6 +48,10 @@ export default function EditProductPage({ params }) {
       sales_category: {
         ...formData.sales_category,
         b2c_category: formData.sales_category?.b2c_category?.id || null,
+      },
+      packaging_units: {
+        ...formData.packaging_units,
+        package_size: Number(formData.package_size) || 0,
       },
     };
 
@@ -66,6 +80,9 @@ export default function EditProductPage({ params }) {
           productModalConfig={productModalConfig}
           productMasterData={productMasterData}
           handleSave={handleSave}
+          manufacturers={manufacturers}
+          molecules={molecules}
+          b2cProducts={b2cProducts}
         />
       </div>
     </>
