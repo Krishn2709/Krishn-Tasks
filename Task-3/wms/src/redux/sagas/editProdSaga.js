@@ -4,7 +4,7 @@ import {
   fetchProductDetails,
   fetchProductDetailsSuccess,
   fetchProductDetailsFailure,
-  updateProduct,
+  updateProductRequest,
   updateProductSuccess,
   updateProductFailure,
 } from "../slices/editProdSlice";
@@ -48,7 +48,7 @@ function* updateProductSaga(action) {
 // Watcher Saga
 export function* editProductSaga() {
   yield takeLatest(fetchProductDetails.type, fetchProductDetailsSaga);
-  yield takeLatest(updateProduct.type, updateProductSaga);
+  yield takeLatest(updateProductRequest.type, updateProductSaga);
 }
 
 export default editProductSaga;

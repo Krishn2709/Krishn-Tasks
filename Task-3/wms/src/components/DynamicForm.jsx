@@ -53,7 +53,6 @@ const DynamicForm = ({
       }
     }
   };
-  console.log(formData);
 
   const renderFields = (fields = []) => {
     return fields.map((field, index) => (

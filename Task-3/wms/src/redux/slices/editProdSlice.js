@@ -29,7 +29,7 @@ const editProductSlice = createSlice({
     },
 
     // Update product
-    updateProduct: (state) => {
+    updateProductRequest: (state) => {
       state.updateLoading = true;
       state.updateError = null;
       state.updateSuccess = false;
@@ -58,7 +58,7 @@ export const {
   fetchProductDetails,
   fetchProductDetailsSuccess,
   fetchProductDetailsFailure,
-  updateProduct,
+  updateProductRequest,
   updateProductSuccess,
   updateProductFailure,
   resetUpdateStatus,

@@ -24,6 +24,7 @@ const InputField = ({
   b2cProducts,
 }) => {
   let optionsArray = [];
+  console.log(value);
 
   if (label === "Manufacturer") {
     optionsArray = manufacturers || [];
@@ -36,8 +37,9 @@ const InputField = ({
       ? providedOptions
       : productMasterData?.[providedOptions] || [];
   }
-  const fieldValue =
-    value ?? (path ? getValueByPath(editProdData, path) : "") ?? "";
+  const fieldValue = path
+    ? getValueByPath(editProdData, path) ?? ""
+    : value ?? "";
 
   if (type === "title") {
     return <h2 className="text-xl font-semibold mb-4">{label}</h2>;
@@ -66,7 +68,7 @@ const InputField = ({
         <select
           className={styles.inputField}
           name={name}
-          value={fieldValue || ""}
+          defaultValue={fieldValue}
           onChange={onChange}
           disabled={disabled}
           required={required}
@@ -99,7 +101,7 @@ const InputField = ({
           name={name}
           required={required}
           placeholder={placeholder}
-          value={fieldValue || ""}
+          defaultValue={fieldValue}
           onChange={onChange}
           disabled={disabled}
         />

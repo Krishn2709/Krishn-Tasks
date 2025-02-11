@@ -74,7 +74,6 @@ export default function Page() {
           : [selectedCombination.id],
       },
 
-      // Boolean flags
       is_discontinued: false,
       is_refrigerated: false,
       can_sell_online: true,
@@ -85,7 +84,6 @@ export default function Page() {
       is_hidden_from_alternate_products:
         formData.is_hidden_from_alternate_products === "Yes",
 
-      // Taxes
       taxes: {
         gst_type: formData.gst_type,
         hsn_code: formData.hsn_code,
@@ -96,7 +94,7 @@ export default function Page() {
         b2c_category: Number(formData.b2c_category) || undefined,
         sales_trend_category: formData.sales_trend_category,
         return_type: formData.product_return_type,
-        // Default values for return policy
+
         purchase: 90,
         purchase_return: -60,
         transfer_out: 60,
