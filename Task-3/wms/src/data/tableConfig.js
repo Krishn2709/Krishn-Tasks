@@ -37,6 +37,9 @@ const tableConfig = {
         };
         return classMap[status] || "";
       },
+      render: (status) => (
+        <span className={classMap[status] || ""}>{status}</span>
+      ),
     },
     {
       id: 7,

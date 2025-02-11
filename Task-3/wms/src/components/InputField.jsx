@@ -21,14 +21,23 @@ const InputField = ({
   path,
   manufacturers,
   molecules,
+  b2cProducts,
 }) => {
-  const optionsArray = Array.isArray(providedOptions)
-    ? providedOptions
-    : productMasterData?.[providedOptions] || [];
-  console.log(manufacturers);
-  console.log(molecules);
+  let optionsArray = [];
 
-  const fieldValue = path ? getValueByPath(editProdData, path) : value;
+  if (label === "Manufacturer") {
+    optionsArray = manufacturers || [];
+  } else if (label === "Molecules") {
+    optionsArray = molecules || [];
+  } else if (label === "B2C Product Type") {
+    optionsArray = b2cProducts || [];
+  } else {
+    optionsArray = Array.isArray(providedOptions)
+      ? providedOptions
+      : productMasterData?.[providedOptions] || [];
+  }
+  const fieldValue =
+    value ?? (path ? getValueByPath(editProdData, path) : "") ?? "";
 
   if (type === "title") {
     return <h2 className="text-xl font-semibold mb-4">{label}</h2>;
@@ -65,12 +74,15 @@ const InputField = ({
           <option value="">Select {label}</option>
           {optionsArray.map((option, index) => {
             const optionValue =
-              typeof option === "object" ? option.value : option;
+              typeof option === "object" ? option.name : option;
+
             const optionDisplay =
-              typeof option === "object"
+              label === "B2C Product Type"
+                ? option.category_name
+                : typeof option === "object"
                 ? optionLabel
                   ? option[optionLabel]
-                  : option.label
+                  : option.name
                 : option;
 
             return (
@@ -95,4 +107,5 @@ const InputField = ({
     </div>
   );
 };
+
 export default InputField;

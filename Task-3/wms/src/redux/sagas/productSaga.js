@@ -1,5 +1,5 @@
 import { takeLatest, put, call, select } from "redux-saga/effects";
-import { apiMethods } from "../../utils/api";
+import { apiMethods } from "../../utils/endpoints";
 import {
   fetchProductsRequest,
   fetchProductsSuccess,

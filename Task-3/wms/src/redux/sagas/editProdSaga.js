@@ -1,5 +1,5 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { apiMethods } from "../../utils/api";
+import { apiMethods } from "../../utils/endpoints";
 import {
   fetchProductDetails,
   fetchProductDetailsSuccess,
@@ -9,7 +9,6 @@ import {
   updateProductFailure,
 } from "../slices/editProdSlice";
 
-// Worker Saga: Fetch product details
 function* fetchProductDetailsSaga(action) {
   try {
     const productId = action.payload;

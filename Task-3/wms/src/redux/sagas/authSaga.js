@@ -1,5 +1,5 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { apiMethods } from "../../utils/api";
+import { apiMethods } from "../../utils/endpoints";
 import { loginRequest, loginSuccess, loginFailure } from "../slices/authSlice";
 
 function* loginSaga(action) {

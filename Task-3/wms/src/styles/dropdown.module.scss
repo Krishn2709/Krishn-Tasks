@@ -8,6 +8,13 @@
   padding: 10px;
   border: 1px solid #e0e0e0;
   background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  height: 45px !important;
+
+  span {
+    color: #b1b1b1;
+  }
 }
 
 .options {

@@ -1,147 +1,67 @@
-// addProdSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  product: {},
-  productMasterData: {
-    product_type: [],
-    dosage_form: [],
-    package_type: [],
-    uom: [],
-    schedule_type_code: [],
-    gst_type: [],
-    b2b_category: [],
-    sales_trend_category: [],
-    product_return_type: [],
-    product_return_details: {
-      RETURNABLE: {},
-      NON_RETURNABLE: {},
-    },
-    mis_reporting_category: [],
-    mis_warehouse_category: [],
-  },
-  manufacturers: [],
-  molecules: [],
+  loading: false,
+  success: false,
+  b2cProducts: [],
   loading: {
-    masterData: false,
-    manufacturers: false,
-    molecules: false,
+    b2cProducts: false,
     addProduct: false,
   },
   error: {
-    masterData: null,
-    manufacturers: null,
-    molecules: null,
+    b2cProducts: null,
     addProduct: null,
   },
 };
 
-const addProductSlice = createSlice({
+const productSlice = createSlice({
   name: "addProduct",
   initialState,
   reducers: {
-    // Product Master Data
-    fetchProductMasterData: (state) => {
-      state.loading.masterData = true;
-      state.error.masterData = null;
+    postProductRequest: (state) => {
+      state.loading.addProduct = true;
+      state.success = false;
+      state.error.addProduct = null;
     },
-    fetchProductMasterDataSuccess: (state, action) => {
-      state.loading.masterData = false;
-      state.productMasterData = action.payload;
-      state.error.masterData = null;
+    postProductSuccess: (state) => {
+      state.loading.addProduct = false;
+      state.success = true;
+      state.error.addProduct = null;
     },
-    fetchProductMasterDataFailure: (state, action) => {
-      state.loading.masterData = false;
-      state.error.masterData = action.payload;
-    },
-
-    // Manufacturers
-    fetchManufacturers: (state) => {
-      state.loading.manufacturers = true;
-      state.error.manufacturers = null;
-    },
-    fetchManufacturersSuccess: (state, action) => {
-      state.loading.manufacturers = false;
-      state.manufacturers = action.payload;
-      state.error.manufacturers = null;
-    },
-    fetchManufacturersFailure: (state, action) => {
-      state.loading.manufacturers = false;
-      state.error.manufacturers = action.payload;
-    },
-    searchManufacturers: (state, action) => {
-      state.loading.manufacturers = true;
-      state.error.manufacturers = null;
+    postProductFailure: (state, action) => {
+      state.loading.addProduct = false;
+      state.success = false;
+      state.error.addProduct = action.payload;
     },
 
-    // Molecules
-    fetchMolecules: (state) => {
-      state.loading.molecules = true;
-      state.error.molecules = null;
+    // b2c_Products
+    fetchB2CProducts: (state) => {
+      state.loading.b2cProducts = true;
+      state.error.b2cProducts = null;
     },
-    fetchMoleculesSuccess: (state, action) => {
-      state.loading.molecules = false;
-      state.molecules = action.payload;
-      state.error.molecules = null;
+    fetchB2CProductsSuccess: (state, action) => {
+      state.loading.b2cProducts = false;
+      state.b2cProducts = action.payload;
+      state.error.b2cProducts = null;
     },
-    fetchMoleculesFailure: (state, action) => {
-      state.loading.molecules = false;
-      state.error.molecules = action.payload;
+    fetchB2CProductsFailure: (state, action) => {
+      state.loading.b2cProducts = false;
+      state.error.b2cProducts = action.payload;
     },
-    searchMolecules: (state, action) => {
-      state.loading.molecules = true;
-      state.error.molecules = null;
+    searchB2CProducts: (state, action) => {
+      state.loading.b2cProducts = true;
+      state.error.b2cProducts = null;
     },
-
-    // Add Product
-    setProduct: (state, action) => {
-      state.product = action.payload;
-    },
-    updateProductField: (state, action) => {
-      const { field, value } = action.payload;
-      state.product[field] = value;
-    },
-    resetProduct: (state) => {
-      state.product = {};
-      state.loading = false;
-      state.error = null;
-    },
-    submitProductRequest: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    submitProductSuccess: (state) => {
-      state.loading = false;
-    },
-    submitProductFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    // Reset state
-    resetAddProduct: () => initialState,
   },
 });
 
 export const {
-  fetchProductMasterData,
-  fetchProductMasterDataSuccess,
-  fetchProductMasterDataFailure,
-  fetchManufacturers,
-  fetchManufacturersSuccess,
-  fetchManufacturersFailure,
-  searchManufacturers,
-  fetchMolecules,
-  fetchMoleculesSuccess,
-  fetchMoleculesFailure,
-  searchMolecules,
-  setProduct,
-  updateProductField,
-  resetProduct,
-  submitProductRequest,
-  submitProductSuccess,
-  submitProductFailure,
-  resetAddProduct,
-} = addProductSlice.actions;
-
-export default addProductSlice.reducer;
+  postProductRequest,
+  postProductSuccess,
+  postProductFailure,
+  fetchB2CProducts,
+  fetchB2CProductsSuccess,
+  fetchB2CProductsFailure,
+  searchB2CProducts,
+} = productSlice.actions;
+export default productSlice.reducer;

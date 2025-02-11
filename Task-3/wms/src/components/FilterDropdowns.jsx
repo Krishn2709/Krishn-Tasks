@@ -26,6 +26,7 @@ const FilterDropdowns = ({
       dispatch(searchMolecules());
     }
   }, [dispatch, molecules.length]);
+
   if (!filters.showFilters) return null;
 
   return (
@@ -67,34 +68,26 @@ const FilterDropdowns = ({
         />
       </div>
 
-      <div className={styles.filterGroup}>
-        <select
-          value={filters.manufacturer}
-          onChange={(e) => onFilterChange("manufacturer", e.target.value)}
-          onClick={handleManufacturerClick}
-        >
-          <option value="">Manufacturer</option>
-          {manufacturers.map((mfr) => (
-            <option key={mfr.id} value={mfr.id}>
-              {mfr.name}
-            </option>
-          ))}
-        </select>
+      <div className={styles.filterGroup} onClick={handleManufacturerClick}>
+        <Dropdown
+          options={manufacturers.map((mfr) => ({
+            value: mfr.id,
+            label: mfr.name,
+          }))}
+          selectedValue={filters.manufacturer}
+          onChange={(value) => onFilterChange("manufacturer", value)}
+        />
       </div>
 
-      <div className={styles.filterGroup}>
-        <select
-          value={filters.combination}
-          onChange={(e) => onFilterChange("combination", e.target.value)}
-          onClick={handleMoleculeClick}
-        >
-          <option value="">Combination</option>
-          {molecules.map((molecule) => (
-            <option key={molecule.id} value={molecule.id}>
-              {molecule.name}
-            </option>
-          ))}
-        </select>
+      <div className={styles.filterGroup} onClick={handleMoleculeClick}>
+        <Dropdown
+          options={molecules.map((molecule) => ({
+            value: molecule.id,
+            label: molecule.name,
+          }))}
+          selectedValue={filters.combination}
+          onChange={(value) => onFilterChange("combination", value)}
+        />
       </div>
     </div>
   );

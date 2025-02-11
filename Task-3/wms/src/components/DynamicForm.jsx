@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import styles from "../styles/Modal.module.scss";
 import InputField from "./InputField";
 
@@ -13,15 +12,13 @@ const DynamicForm = ({
   handleSave,
   manufacturers,
   molecules,
+  b2cProducts,
 }) => {
-  const dispatch = useDispatch();
   const defaultType = productModalConfig?.defaultProductType || "Goods";
   const [formData, setFormData] = useState(editProdData || {});
   const [productType, setProductType] = useState(defaultType);
   const [activeTab, setActiveTab] = useState("");
-  // console.log("editProdData", editProdData);
 
-  // Get current configuration based on product type
   const config = productModalConfig?.productTypes?.[productType];
 
   useEffect(() => {
@@ -39,10 +36,12 @@ const DynamicForm = ({
     }
   }, [editProdData]);
 
-  const handleChangeType = (e, field) => {
-    const value = e.target.value;
-
-    setFormData((prev) => ({ ...prev, [field.label]: value }));
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [field.key || field.label]: value,
+    }));
 
     if (field.label === "Product Type") {
       const newType = value;
@@ -54,6 +53,7 @@ const DynamicForm = ({
       }
     }
   };
+  console.log(formData);
 
   const renderFields = (fields = []) => {
     return fields.map((field, index) => (
@@ -61,11 +61,11 @@ const DynamicForm = ({
         key={`${field.label}-${index}`}
         label={field.label}
         type={field.type === "dropdown" ? "select" : field.type}
-        name={field.label}
+        name={field.key || field.label}
         required={field.required}
         placeholder={field.label}
-        value={formData[field.label] || ""}
-        onChange={(e) => handleChangeType(e, field)}
+        value={formData[field.key || field.label] || ""}
+        onChange={(e) => handleInputChange(e, field)}
         providedOptions={field.options}
         disabled={field.disabled}
         productMasterData={productMasterData}
@@ -73,6 +73,7 @@ const DynamicForm = ({
         path={field.mapping}
         manufacturers={manufacturers}
         molecules={molecules}
+        b2cProducts={b2cProducts}
       />
     ));
   };
@@ -81,17 +82,17 @@ const DynamicForm = ({
     <div className={styles.modalOverlay}>
       <div className={styles.modalContainer}>
         <div className={styles.modalHeader}>
-          <h1>{config.sections[0]?.fields?.[0]?.label}</h1>
+          <h1>{config?.sections[0]?.fields?.[0]?.label}</h1>
           <button className={styles.closeButton} onClick={onClose}>
-            {config.sections[0]?.fields?.[1]?.label}
+            {config?.sections[0]?.fields?.[1]?.label}
           </button>
         </div>
 
         <div className={styles.formGroup}>
-          {renderFields(config.sections[1]?.fields)}
+          {renderFields(config?.sections[1]?.fields)}
         </div>
 
-        {config.sections[2]?.tabs && (
+        {config?.sections[2]?.tabs && (
           <div className={styles.tabs}>
             {config.sections[2].tabs.map((tab) => (
               <button
@@ -108,12 +109,15 @@ const DynamicForm = ({
         )}
 
         <div className={styles.formGroup}>
-          {renderFields(config.sections[3]?.fields?.[activeTab])}
+          {renderFields(config?.sections[3]?.fields?.[activeTab])}
         </div>
 
         <div className={styles.modalFooter}>
-          <button className={styles.saveButton} onClick={handleSave}>
-            {config.sections[4]?.fields?.[0]?.label}
+          <button
+            className={styles.saveButton}
+            onClick={() => handleSave(formData)}
+          >
+            {config?.sections[4]?.fields?.[0]?.label}
           </button>
         </div>
       </div>

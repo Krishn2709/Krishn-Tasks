@@ -145,6 +145,7 @@ const Page = () => {
               <SearchField
                 searchText={filters.searchText}
                 onSearchChange={handleSearchChange}
+                placeholder={"Search by..."}
               />
               <Dropdown
                 options={searchFields}
