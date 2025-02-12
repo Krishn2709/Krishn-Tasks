@@ -126,6 +126,9 @@ const Page = () => {
     if (action == "edit") {
       router.push("/product-master/edit-product/" + data?.product_id);
     }
+    if (action == "copy") {
+      router.push("/product-master/copy-product/" + data?.product_id);
+    }
   };
 
   return (

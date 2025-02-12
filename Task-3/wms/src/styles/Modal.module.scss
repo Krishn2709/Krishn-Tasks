@@ -9,6 +9,17 @@
   margin-top: 10px;
 }
 
+.error {
+  border: 1px solid red !important;
+  background-color: #ffe6e6;
+}
+
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
 .modalContainer {
   background: #fff;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
