@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash/debounce";
 import Navbar from "../../components/Navbar";
@@ -24,8 +24,8 @@ import {
   searchManufacturers,
   searchMolecules,
 } from "../../redux/slices/productSlice";
-import Dropdown from "@/components/DropDown";
 import tableConfig from "../../data/tableConfig";
+import { ToastContainer, toast } from "react-toastify";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -42,6 +42,8 @@ const Page = () => {
     manufacturers,
     molecules,
   } = useSelector((state) => state.products);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const queryParamsString = useMemo(
     () =>
@@ -74,6 +76,7 @@ const Page = () => {
 
   const handleSearchFieldChange = (field) => {
     debouncedSearch(filters.searchText, field);
+    setIsDropdownOpen(false); // Close dropdown after selection
   };
 
   const handleFilterChange = useCallback(
@@ -111,6 +114,7 @@ const Page = () => {
     console.error(error);
     router.push("/login");
   }
+
   const searchFields = [
     { value: "product_code", label: "Product Code" },
     { value: "ws_code", label: "Wondersoft Code" },
@@ -123,10 +127,10 @@ const Page = () => {
   };
 
   const handleOnClick = (action, data) => {
-    if (action == "edit") {
+    if (action === "edit") {
       router.push("/product-master/edit-product/" + data?.product_id);
     }
-    if (action == "copy") {
+    if (action === "copy") {
       router.push("/product-master/copy-product/" + data?.product_id);
     }
   };
@@ -151,28 +155,81 @@ const Page = () => {
                 onSearchChange={handleSearchChange}
                 placeholder={"Search by..."}
               />
-              <Dropdown
-                options={searchFields}
-                selectedValue={filters.searchField}
-                onChange={handleSearchFieldChange}
-              />
+              <div
+                className={styles.customDropdown}
+                onBlur={() => setIsDropdownOpen(false)}
+              >
+                <button
+                  className={styles.dropdownButton}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  {searchFields.find((sf) => sf.value === filters.searchField)
+                    ?.label || "Select Field"}
+
+                  <span className={styles.arrow}>
+                    {isDropdownOpen ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-chevron-up"
+                      >
+                        <path d="m18 15-6-6-6 6" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-chevron-down"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+
+                {isDropdownOpen && (
+                  <ul className={styles.dropdownList}>
+                    {searchFields.map((field) => (
+                      <li
+                        key={field.value}
+                        onClick={() => handleSearchFieldChange(field.value)}
+                        className={styles.dropdownItem}
+                      >
+                        {field.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
             <div className={styles.rightControls}>
-              <div>
-                <button
-                  className={styles.filterButton}
-                  onClick={() => dispatch(toggleFilters())}
-                >
-                  <img
-                    src="https://stage.mkwms.dev/assets/table/filterIcon.svg"
-                    alt="Masters Icon"
-                    width="20"
-                    height="20"
-                    className={styles.navSvg}
-                  />
-                  Filter
-                </button>
-              </div>
+              <button
+                className={styles.filterButton}
+                onClick={() => dispatch(toggleFilters())}
+              >
+                <img
+                  src="https://stage.mkwms.dev/assets/table/filterIcon.svg"
+                  alt="Masters Icon"
+                  width="20"
+                  height="20"
+                  className={styles.navSvg}
+                />
+                Filter
+              </button>
 
               <SortByDropdown
                 sorting={sorting}

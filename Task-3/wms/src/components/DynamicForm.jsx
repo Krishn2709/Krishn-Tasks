@@ -13,6 +13,8 @@ const DynamicForm = ({
   manufacturers,
   molecules,
   b2cProducts,
+  errors,
+  tabErrors,
 }) => {
   const defaultType = productModalConfig?.defaultProductType || "Goods";
   const [formData, setFormData] = useState(editProdData || {});
@@ -73,6 +75,7 @@ const DynamicForm = ({
         manufacturers={manufacturers}
         molecules={molecules}
         b2cProducts={b2cProducts}
+        errors={errors}
       />
     ));
   };
@@ -96,12 +99,13 @@ const DynamicForm = ({
             {config.sections[2].tabs.map((tab) => (
               <button
                 key={tab}
-                className={`${styles.tabButton} ${
-                  activeTab === tab ? styles.activeTab : ""
-                }`}
+                className={`${styles.tabButton} 
+                  ${activeTab === tab ? styles.activeTab : ""} 
+                  ${tabErrors?.[tab] ? styles.errorTab : ""}`}
                 onClick={() => setActiveTab(tab)}
               >
                 {tab}
+                {tabErrors?.[tab] && <span className={styles.errorDot}></span>}
               </button>
             ))}
           </div>

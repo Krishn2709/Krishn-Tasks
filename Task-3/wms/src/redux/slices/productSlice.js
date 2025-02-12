@@ -32,10 +32,6 @@ const initialState = {
   loadingManufacturers: false,
   loadingMolecules: false,
   lastFetchTimestamp: null,
-  cache: {
-    queries: {},
-    ttl: 5 * 60 * 1000,
-  },
 };
 
 const productSlice = createSlice({
@@ -65,16 +61,6 @@ const productSlice = createSlice({
             state.pagination.currentPageRecord,
         };
       }
-
-      const cacheKey = JSON.stringify({
-        page: state.pagination.currentPage,
-        filters: state.filters,
-        sorting: state.sorting,
-      });
-      state.cache.queries[cacheKey] = {
-        data: action.payload,
-        timestamp: Date.now(),
-      };
     },
     fetchProductsFailure: (state, action) => {
       state.loading = false;
@@ -125,9 +111,6 @@ const productSlice = createSlice({
     setCurrentPage: (state, action) => {
       state.pagination.currentPage = action.payload;
     },
-    clearCache: (state) => {
-      state.cache.queries = {};
-    },
   },
 });
 
@@ -145,7 +128,6 @@ export const {
   fetchManufacturersSuccess,
   fetchMoleculesSuccess,
   setCurrentPage,
-  clearCache,
 } = productSlice.actions;
 
 export default productSlice.reducer;

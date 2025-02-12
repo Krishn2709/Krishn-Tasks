@@ -10,8 +10,6 @@ function* loginSaga(action) {
     console.log("Login Response:", response.data.user.auth.token);
     yield put(loginSuccess(response.data.user));
   } catch (error) {
-    console.error("Login Error:", error);
-    console.error("Login Error Response:", error.response);
     yield put(loginFailure(error.response?.data?.message || "Login failed"));
   }
 }

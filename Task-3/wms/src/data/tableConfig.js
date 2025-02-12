@@ -4,31 +4,37 @@ const tableConfig = {
       id: 1,
       name: "product_code",
       label: "Product Code",
+      width: "60",
     },
     {
       id: 2,
       name: "ws_code",
       label: "Wondersoft Code",
+      width: "60",
     },
     {
       id: 3,
       name: "product_name",
       label: "Product Name",
+      width: "80",
     },
     {
       id: 4,
       name: "manufacturer",
       label: "Manufacturer",
+      width: "110",
     },
     {
       id: 5,
       name: "combination",
       label: "Combination",
+      width: "110",
     },
     {
       id: 6,
       name: "publish_status",
       label: "Status",
+      width: "60",
       getClassName: (status) => {
         const classMap = {
           Published: "published",
@@ -44,8 +50,9 @@ const tableConfig = {
     {
       id: 7,
       name: "action",
-      label: "Action",
+      label: "",
       isCustom: true,
+      width: "0",
       actions: [
         {
           fieldKey: "edit",

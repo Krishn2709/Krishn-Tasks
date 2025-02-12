@@ -22,9 +22,9 @@ const InputField = ({
   manufacturers,
   molecules,
   b2cProducts,
+  errors,
 }) => {
   let optionsArray = [];
-  console.log(value);
 
   if (label === "Manufacturer") {
     optionsArray = manufacturers || [];
@@ -37,9 +37,13 @@ const InputField = ({
       ? providedOptions
       : productMasterData?.[providedOptions] || [];
   }
+
   const fieldValue = path
     ? getValueByPath(editProdData, path) ?? ""
     : value ?? "";
+
+  const fieldKey = name || label;
+  const hasError = errors && errors[fieldKey];
 
   if (type === "title") {
     return <h2 className="text-xl font-semibold mb-4">{label}</h2>;
@@ -60,13 +64,17 @@ const InputField = ({
 
   return (
     <div className={styles.inputGroup}>
-      <label className="text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+      <div className={styles.labelContainer}>
+        <label className="text-gray-700 mb-1">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      </div>
 
       {type === "select" ? (
         <select
-          className={styles.inputField}
+          className={`${styles.inputField} ${
+            hasError ? styles.errorInput : ""
+          }`}
           name={name}
           defaultValue={fieldValue}
           onChange={onChange}
@@ -96,7 +104,9 @@ const InputField = ({
         </select>
       ) : (
         <input
-          className={styles.inputField}
+          className={`${styles.inputField} ${
+            hasError ? styles.errorInput : ""
+          }`}
           type={type}
           name={name}
           required={required}
@@ -105,6 +115,9 @@ const InputField = ({
           onChange={onChange}
           disabled={disabled}
         />
+      )}
+      {hasError && (
+        <span className={styles.errorMessage}>{errors[fieldKey]}</span>
       )}
     </div>
   );

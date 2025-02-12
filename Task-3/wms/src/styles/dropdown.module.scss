@@ -8,6 +8,7 @@
   padding: 10px;
   border: 1px solid #e0e0e0;
   background-color: #fff;
+  border-radius: 100px;
   display: flex;
   justify-content: space-between;
   height: 45px !important;
@@ -26,8 +27,12 @@
   background: #f5f4f4;
   border: 1px solid #e0e0e0;
   max-height: 200px;
-  overflow-y: auto;
+  overflow-y: scroll;
   z-index: 10;
+}
+
+.options::-webkit-scrollbar {
+  display: none;
 }
 
 .option {

@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Navigator from "@/components/Navigator";
-import Navbar from "@/components/Navbar";
-import styles from "../../../styles/addProduct.module.scss";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import DynamicForm from "../../../components/DynamicForm";
-import productModalConfig from "../../../data/addProd.js";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProductMasterData } from "../../../redux/slices/prodMasterSlice";
+import Navbar from "@/components/Navbar";
+import Navigator from "@/components/Navigator";
+import DynamicForm from "../../../components/DynamicForm";
+import styles from "../../../styles/addProduct.module.scss";
+import productModalConfig from "../../../data/addProd.js";
 import {
+  fetchProductMasterData,
   searchManufacturers,
   searchMolecules,
-} from "../../../redux/slices/productSlice";
+} from "../../../redux/slices/prodMasterSlice";
 import {
   postProductRequest,
   fetchB2CProducts,
@@ -20,7 +20,9 @@ import {
 
 export default function Page() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     dispatch(fetchProductMasterData());
@@ -29,49 +31,79 @@ export default function Page() {
     dispatch(fetchB2CProducts());
   }, [dispatch]);
 
-  const { manufacturers, molecules } = useSelector((state) => state.products);
-  const { productMasterData } = useSelector((state) => state.productMasterData);
-  const { b2cProducts } = useSelector((state) => state.addProduct);
+  const { manufacturers, molecules, productMasterData, b2cProducts } =
+    useSelector((state) => ({
+      manufacturers: state.products.manufacturers,
+      molecules: state.products.molecules,
+      productMasterData: state.productMasterData.productMasterData,
+      b2cProducts: state.addProduct.b2cProducts,
+    }));
 
-  const router = useRouter();
-  const onClose = () => {
-    router.push("/product-master");
+  const onClose = () => router.push("/product-master");
+
+  const validateForm = (data) => {
+    const errors = {};
+    const productType = data.product_type || "Goods";
+    const sections =
+      productModalConfig.productTypes[productType]?.sections || [];
+
+    sections.forEach(({ fields }) => {
+      if (!fields) return;
+
+      const checkFields = (field) => {
+        if (field.required && !data[field.key]) {
+          errors[field.key] = "required*";
+        }
+      };
+
+      if (Array.isArray(fields)) {
+        fields.forEach(checkFields);
+      } else {
+        Object.values(fields).flat().forEach(checkFields);
+      }
+    });
+
+    return errors;
   };
 
+  const tabErrors = useMemo(() => {
+    if (!errors) return {};
+    const productType = formData.product_type || "Goods";
+    const sections =
+      productModalConfig.productTypes[productType]?.sections || [];
+    const dynamicSectionFields = sections[3]?.fields || {};
+
+    return Object.keys(dynamicSectionFields).reduce((acc, tabName) => {
+      if (dynamicSectionFields[tabName]?.some((field) => errors[field.key])) {
+        acc[tabName] = true;
+      }
+      return acc;
+    }, {});
+  }, [errors, formData.product_type]);
+
   const transformFormData = (formData) => {
-    const selectedb2cCategory = b2cProducts.find(
-      (b) => b.category_name === formData.b2c_category
-    );
-    const selectedManufacturer = manufacturers.find(
-      (m) => m.name === formData.manufacturer
-    );
-    const selectedCombination = molecules.find(
-      (c) => c.name === formData.combination
-    );
-    const transformedData = {
+    const findByName = (list, name) => list.find((item) => item.name === name);
+
+    return {
       product_type: formData.product_type,
       product_name: formData.product_name,
       is_active: formData.is_active === "Yes",
-
       transaction_units: {
         purchase_unit: Number(formData.purchase_unit) || 1,
         sales_unit: Number(formData.sales_unit) || 1,
         transfer_unit: Number(formData.transfer_unit) || 1,
       },
-
       packaging_units: {
         dosage_form: formData.dosage_form,
         package_type: formData.package_type,
         uom: formData.uom,
         package_size: formData.package_size,
       },
-
       combination: {
-        molecules: Array.isArray(formData.combination)
-          ? [selectedCombination.id]
-          : [selectedCombination.id],
+        molecules: [findByName(molecules, formData.combination)?.id].filter(
+          Boolean
+        ),
       },
-
       is_discontinued: false,
       is_refrigerated: false,
       can_sell_online: true,
@@ -81,18 +113,15 @@ export default function Page() {
       is_banned: formData.is_banned === "Yes",
       is_hidden_from_alternate_products:
         formData.is_hidden_from_alternate_products === "Yes",
-
       taxes: {
         gst_type: formData.gst_type,
         hsn_code: formData.hsn_code,
       },
-
       sales_category: {
         b2b_category: formData.b2b_category,
-        b2c_category: Number(formData.b2c_category) || undefined,
+        b2c_category: findByName(b2cProducts, formData.b2c_category)?.id,
         sales_trend_category: formData.sales_trend_category,
         return_type: formData.product_return_type,
-
         purchase: 90,
         purchase_return: -60,
         transfer_out: 60,
@@ -101,53 +130,40 @@ export default function Page() {
         franchise_in: 0,
         b2c_out: 120,
         b2c_in: 0,
-        b2c_category: selectedb2cCategory.id,
       },
-
-      manufacturer: {
-        id: selectedManufacturer.id,
-        name: selectedManufacturer.name,
-      },
-
+      manufacturer: findByName(manufacturers, formData.manufacturer) || {},
       mis_reporting_category: formData.mis_reporting_category,
       mis_warehouse_category: formData.mis_warehouse_category,
-
       mrp: formData.mrp,
     };
-
-    return JSON.parse(JSON.stringify(transformedData));
   };
 
-  async function handleSave(formData) {
-    const errors = {};
-    const productType = formData.product_type || "Goods";
-    const sections =
-      productModalConfig.productTypes[productType]?.sections || [];
+  const handleFormChange = (newFormData) => {
+    setFormData(newFormData);
+    setErrors((prevErrors) =>
+      Object.keys(newFormData).reduce((acc, key) => {
+        if (!newFormData[key]) acc[key] = prevErrors[key];
+        return acc;
+      }, {})
+    );
+  };
 
-    sections.forEach((section) => {
-      if (Array.isArray(section.fields)) {
-        section.fields.forEach((field) => {
-          if (field.required && !formData[field.key]) {
-            errors[field.key] = "This field is required";
-          }
-        });
-      }
-    });
-
-    if (Object.keys(errors).length > 0) {
-      setErrors(errors);
-      console.log("Validation Errors:", errors);
+  const handleSave = async (formData) => {
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
       return;
     }
 
-    const transformedData = transformFormData(formData);
     try {
+      const transformedData = transformFormData(formData);
       await dispatch(postProductRequest(transformedData));
       router.push("/product-master");
     } catch (error) {
       console.error("Error saving product:", error);
+      setErrors({ submit: "Failed to save product. Please try again." });
     }
-  }
+  };
 
   return (
     <>
@@ -163,6 +179,8 @@ export default function Page() {
           handleSave={handleSave}
           errors={errors}
           b2cProducts={b2cProducts}
+          onFormChange={handleFormChange}
+          tabErrors={tabErrors}
         />
       </div>
     </>

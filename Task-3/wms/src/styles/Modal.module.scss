@@ -9,15 +9,15 @@
   margin-top: 10px;
 }
 
-.error {
-  border: 1px solid red !important;
-  background-color: #ffe6e6;
+.inputGroup {
+  margin-bottom: 1rem;
 }
 
-.errorText {
-  color: red;
-  font-size: 12px;
-  margin-top: 5px;
+.labelContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
 }
 
 .modalContainer {
@@ -112,4 +112,24 @@
   padding: 6px 20px;
   cursor: pointer;
   border-radius: 4px;
+}
+.errorMessage {
+  display: flex;
+  color: #dc2626;
+  font-size: 0.875rem;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.errorInput {
+  border: 1px solid #dc2626;
+
+  &:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 1px #dc2626;
+  }
+}
+
+.errorTab {
+  color: #dc2626;
 }

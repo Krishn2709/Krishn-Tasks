@@ -8,7 +8,9 @@ const ProductList = ({ products, tableConfig, handleOnClick }) => {
       <thead>
         <tr>
           {tableConfig.fields.map((field) => (
-            <th key={field.id}>{field.label}</th>
+            <th key={field.id} style={{ width: `${field.width}px` }}>
+              {field.label}
+            </th>
           ))}
         </tr>
       </thead>

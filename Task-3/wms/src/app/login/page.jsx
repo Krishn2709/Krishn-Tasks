@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { loginRequest } from "../../redux/slices/authSlice";
 import styles from "../../styles/login.module.scss";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [isClient, setIsClient] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const dispatch = useDispatch();
   const router = useRouter();
   const { loading, error, user } = useSelector((state) => state.auth);
@@ -26,9 +27,30 @@ const Login = () => {
     }
   }, [user, isClient, router]);
 
+  const validateForm = () => {
+    let newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(loginRequest({ email, password }));
+    if (validateForm()) {
+      dispatch(loginRequest({ email, password }));
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -51,7 +73,7 @@ const Login = () => {
           </div>
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (
-              <div className={styles.error}>
+              <div className={styles.validationError}>
                 <p>{error}</p>
               </div>
             )}
@@ -69,10 +91,12 @@ const Login = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 className={styles.input}
               />
             </div>
+            {errors.email && (
+              <p className={styles.validationError}>{errors.email}</p>
+            )}
 
             <div className={styles.inputGroup}>
               <img
@@ -87,10 +111,8 @@ const Login = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 className={styles.input}
               />
-
               <img
                 src={
                   showPassword
@@ -104,6 +126,9 @@ const Login = () => {
                 onClick={togglePasswordVisibility}
               />
             </div>
+            {errors.password && (
+              <p className={styles.validationError}>{errors.password}</p>
+            )}
 
             <button
               type="submit"

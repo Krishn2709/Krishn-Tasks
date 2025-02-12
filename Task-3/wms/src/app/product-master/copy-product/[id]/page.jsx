@@ -18,7 +18,7 @@ import { fetchB2CProducts } from "../../../../redux/slices/addProdSlice";
 import { postProductRequest } from "../../../../redux/slices/addProdSlice";
 
 export default function EditProductPage({ params }) {
-  const unwrappedParams = use(params); // Unwrapping the params promise
+  const unwrappedParams = use(params);
   const { id } = unwrappedParams;
   const dispatch = useDispatch();
   const router = useRouter();
