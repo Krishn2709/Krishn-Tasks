@@ -133,3 +133,29 @@
 .errorTab {
   color: #dc2626;
 }
+
+.searchDropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownList {
+  position: absolute;
+  width: 762px;
+  background: white;
+  border: 1px solid #ddd;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  border-radius: 4px;
+}
+
+.dropdownItem {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.dropdownItem:hover {
+  background: #f0f0f0;
+}

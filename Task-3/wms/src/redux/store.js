@@ -6,6 +6,7 @@ import rootSaga from "./sagas/rootSaga";
 import ProductMasterReducer from "./slices/prodMasterSlice";
 import editProductReducer from "./slices/editProdSlice";
 import addProductReducer from "./slices/addProdSlice";
+import formDataReducer from "./slices/formDataSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -16,6 +17,7 @@ const store = configureStore({
     productMasterData: ProductMasterReducer,
     editProduct: editProductReducer,
     addProduct: addProductReducer,
+    formData: formDataReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),

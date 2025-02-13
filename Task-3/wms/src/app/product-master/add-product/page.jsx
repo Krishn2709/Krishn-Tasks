@@ -8,15 +8,15 @@ import Navigator from "@/components/Navigator";
 import DynamicForm from "../../../components/DynamicForm";
 import styles from "../../../styles/addProduct.module.scss";
 import productModalConfig from "../../../data/addProd.js";
-import {
-  fetchProductMasterData,
-  searchManufacturers,
-  searchMolecules,
-} from "../../../redux/slices/prodMasterSlice";
+import { fetchProductMasterData } from "../../../redux/slices/prodMasterSlice";
 import {
   postProductRequest,
   fetchB2CProducts,
 } from "../../../redux/slices/addProdSlice";
+import {
+  searchManufacturers,
+  searchMolecules,
+} from "@/redux/slices/productSlice";
 
 export default function Page() {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export default function Page() {
     dispatch(searchManufacturers());
     dispatch(searchMolecules());
     dispatch(fetchB2CProducts());
-  }, [dispatch]);
+  }, []);
 
   const { manufacturers, molecules, productMasterData, b2cProducts } =
     useSelector((state) => ({
@@ -83,6 +83,8 @@ export default function Page() {
 
   const transformFormData = (formData) => {
     const findByName = (list, name) => list.find((item) => item.name === name);
+    const findByNameB2C = (list, name) =>
+      list.find((item) => item.category_name === name);
 
     return {
       product_type: formData.product_type,
@@ -119,7 +121,7 @@ export default function Page() {
       },
       sales_category: {
         b2b_category: formData.b2b_category,
-        b2c_category: findByName(b2cProducts, formData.b2c_category)?.id,
+        b2c_category: findByNameB2C(b2cProducts, formData.b2c_category)?.id,
         sales_trend_category: formData.sales_trend_category,
         return_type: formData.product_return_type,
         purchase: 90,

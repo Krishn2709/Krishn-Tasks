@@ -19,7 +19,8 @@ const commonSections = {
       {
         type: "dropdown",
         label: "Product Type",
-        options: ["Goods", "Services"],
+        disabled: true,
+        options: "product_type",
         required: true,
         key: "product_type",
         mapping: "product_type",
@@ -114,7 +115,6 @@ const dynamicSectionFields = {
       label: "Package Size",
       key: "package_size",
       mapping: "packaging_units.package_size",
-      required: true,
     },
   ],
   "Molecule Composition*": [

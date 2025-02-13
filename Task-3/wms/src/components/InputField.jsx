@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "../styles/Modal.module.scss";
+import { SearchSpecial } from "./SearchSpecial";
 
 const getValueByPath = (obj, path) => {
   return path?.split(".").reduce((acc, key) => acc?.[key], obj);
@@ -24,7 +25,10 @@ const InputField = ({
   b2cProducts,
   errors,
 }) => {
+  const [searchText, setSearchText] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   let optionsArray = [];
+  console.log(manufacturers);
 
   if (label === "Manufacturer") {
     optionsArray = manufacturers || [];
@@ -44,6 +48,40 @@ const InputField = ({
 
   const fieldKey = name || label;
   const hasError = errors && errors[fieldKey];
+
+  const isSearchableDropdown =
+    label === "Manufacturer" ||
+    label === "Molecules" ||
+    label === "B2C Product Type";
+
+  const filteredOptions = optionsArray.filter((option) => {
+    const optionName =
+      label === "B2C Product Type"
+        ? option.category_name
+        : typeof option === "object"
+        ? option.name
+        : option;
+    return optionName?.toLowerCase().includes(searchText.toLowerCase());
+  });
+
+  const handleSearchChange = (event) => {
+    const text = event.target.value;
+    setSearchText(text);
+    setShowDropdown(true);
+  };
+
+  const handleOptionSelect = (selectedOption) => {
+    const selectedValue =
+      label === "B2C Product Type"
+        ? selectedOption.category_name
+        : typeof selectedOption === "object"
+        ? selectedOption.name
+        : selectedOption;
+
+    onChange({ target: { name, value: selectedValue } });
+    setSearchText(selectedValue);
+    setShowDropdown(false);
+  };
 
   if (type === "title") {
     return <h2 className="text-xl font-semibold mb-4">{label}</h2>;
@@ -70,7 +108,37 @@ const InputField = ({
         </label>
       </div>
 
-      {type === "select" ? (
+      {isSearchableDropdown ? (
+        <div className={styles.searchDropdown}>
+          <input
+            type="text"
+            className={`${styles.inputField} ${
+              errors && errors[name] ? styles.errorInput : ""
+            }`}
+            placeholder={`Search ${label}...`}
+            value={searchText}
+            onChange={handleSearchChange}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          />
+
+          {showDropdown && filteredOptions.length > 0 && (
+            <ul className={styles.dropdownList}>
+              {filteredOptions.map((option, index) => (
+                <li
+                  key={`${name}-${index}`}
+                  className={styles.dropdownItem}
+                  onClick={() => handleOptionSelect(option)}
+                >
+                  {label === "B2C Product Type"
+                    ? option.category_name
+                    : option.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : type === "select" ? (
         <select
           className={`${styles.inputField} ${
             hasError ? styles.errorInput : ""
@@ -85,7 +153,6 @@ const InputField = ({
           {optionsArray.map((option, index) => {
             const optionValue =
               typeof option === "object" ? option.name : option;
-
             const optionDisplay =
               label === "B2C Product Type"
                 ? option.category_name

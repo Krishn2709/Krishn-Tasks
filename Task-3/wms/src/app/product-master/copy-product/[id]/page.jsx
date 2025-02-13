@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchProductMasterData } from "../../../../redux/slices/prodMasterSlice";
 import { fetchProductDetails } from "../../../../redux/slices/editProdSlice";
 import styles from "../../../../styles/addProduct.module.scss";
-import productModalConfig from "../../../../data/editProd";
+import productModalConfig from "../../../../data/copyProd";
 import {
   searchManufacturers,
   searchMolecules,

@@ -25,7 +25,6 @@ import {
   searchMolecules,
 } from "../../redux/slices/productSlice";
 import tableConfig from "../../data/tableConfig";
-import { ToastContainer, toast } from "react-toastify";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -76,7 +75,7 @@ const Page = () => {
 
   const handleSearchFieldChange = (field) => {
     debouncedSearch(filters.searchText, field);
-    setIsDropdownOpen(false); // Close dropdown after selection
+    setIsDropdownOpen(false);
   };
 
   const handleFilterChange = useCallback(
@@ -111,7 +110,6 @@ const Page = () => {
       </div>
     );
   if (error) {
-    console.error(error);
     router.push("/login");
   }
 
@@ -155,10 +153,7 @@ const Page = () => {
                 onSearchChange={handleSearchChange}
                 placeholder={"Search by..."}
               />
-              <div
-                className={styles.customDropdown}
-                onBlur={() => setIsDropdownOpen(false)}
-              >
+              <div className={styles.customDropdown}>
                 <button
                   className={styles.dropdownButton}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}

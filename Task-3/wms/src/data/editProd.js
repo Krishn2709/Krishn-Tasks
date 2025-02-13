@@ -2,7 +2,7 @@ const commonSections = {
   header: {
     title: "Header",
     fields: [
-      { type: "title", label: "Add Product" },
+      { type: "title", label: "Edit Product" },
       { type: "button", label: "✕" },
     ],
   },

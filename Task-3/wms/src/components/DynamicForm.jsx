@@ -40,6 +40,7 @@ const DynamicForm = ({
 
   const handleInputChange = (e, field) => {
     const { value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [field.key || field.label]: value,
