@@ -1,29 +1,36 @@
 import styles from "../styles/search-filter-sort.module.scss";
 import React, { useCallback } from "react";
 import {
+  fetchManufacturers,
+  fetchMolecules,
   searchManufacturers,
   searchMolecules,
 } from "../redux/slices/productSlice";
 import Dropdown from "./DropDown";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-const FilterDropdowns = ({
-  filters,
-  manufacturers,
-  molecules,
-  onFilterChange,
-}) => {
+const FilterDropdowns = ({ filters, onFilterChange }) => {
   const dispatch = useDispatch();
+
+  const { manufacturers, molecules } = useSelector((state) => state.products);
 
   const handleManufacturerClick = useCallback(() => {
     if (manufacturers.length === 0) {
-      dispatch(searchManufacturers());
+      dispatch(fetchManufacturers());
     }
-  }, [dispatch, manufacturers.length]);
+  }, [dispatch]);
+
+  const handleManufacturerSearch = (text) => {
+    dispatch(searchManufacturers(text));
+  };
+
+  const handleMoleculeSearch = (text) => {
+    dispatch(searchMolecules(text));
+  };
 
   const handleMoleculeClick = useCallback(() => {
     if (molecules.length === 0) {
-      dispatch(searchMolecules());
+      dispatch(fetchMolecules());
     }
   }, [dispatch, molecules.length]);
 
@@ -79,6 +86,7 @@ const FilterDropdowns = ({
           ]}
           selectedValue={filters.manufacturer}
           onChange={(value) => onFilterChange("manufacturer", value)}
+          onSearch={handleManufacturerSearch}
         />
       </div>
 
@@ -93,6 +101,7 @@ const FilterDropdowns = ({
           ]}
           selectedValue={filters.combination}
           onChange={(value) => onFilterChange("combination", value)}
+          onSearch={handleMoleculeSearch}
         />
       </div>
     </div>

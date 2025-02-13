@@ -14,8 +14,8 @@ import {
   fetchB2CProducts,
 } from "../../../redux/slices/addProdSlice";
 import {
-  searchManufacturers,
-  searchMolecules,
+  fetchManufacturers,
+  fetchMolecules,
 } from "@/redux/slices/productSlice";
 
 export default function Page() {
@@ -26,8 +26,8 @@ export default function Page() {
 
   useEffect(() => {
     dispatch(fetchProductMasterData());
-    dispatch(searchManufacturers());
-    dispatch(searchMolecules());
+    dispatch(fetchManufacturers());
+    dispatch(fetchMolecules());
     dispatch(fetchB2CProducts());
   }, []);
 
@@ -102,9 +102,9 @@ export default function Page() {
         package_size: formData.package_size,
       },
       combination: {
-        molecules: [findByName(molecules, formData.combination)?.id].filter(
-          Boolean
-        ),
+        molecules: (formData.molecules || []) // Ensure it's an array
+          .map((molId) => molecules.find((m) => m.id === molId)?.id)
+          .filter(Boolean), // Remove undefined values
       },
       is_discontinued: false,
       is_refrigerated: false,

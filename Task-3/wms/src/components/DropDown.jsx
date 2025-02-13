@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import styles from "../styles/dropdown.module.scss";
 import { SearchField } from "./SearchField";
 
-const Dropdown = ({ options, selectedValue, onChange }) => {
+const Dropdown = ({ options, selectedValue, onChange, onSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -11,14 +11,23 @@ const Dropdown = ({ options, selectedValue, onChange }) => {
     setIsOpen(false);
   };
 
+  const handleSearchChange = (text) => {
+    setSearchText(text);
+    if (onSearch) {
+      onSearch(text);
+    }
+  };
+
   const selectedOption = options.find((opt) => opt.value === selectedValue);
   const showSearchBar =
     selectedOption?.label === "Manufacturer" ||
     selectedOption?.label === "Molecule";
 
-  const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredOptions = useMemo(() => {
+    return options.filter((option) =>
+      option.label.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [options, searchText]);
 
   return (
     <div className={styles.dropdown} tabIndex={0}>
@@ -64,21 +73,24 @@ const Dropdown = ({ options, selectedValue, onChange }) => {
             {showSearchBar && (
               <li>
                 <SearchField
-                  searchText={searchText}
-                  onSearchChange={(text) => setSearchText(text)}
+                  onSearchChange={handleSearchChange}
                   placeholder="Search..."
                 />
               </li>
             )}
-            {filteredOptions.map((option) => (
-              <li
-                key={option.value}
-                onClick={() => handleSelect(option.value)}
-                className={styles.option}
-              >
-                {option.label}
-              </li>
-            ))}
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <li
+                  key={option.value}
+                  onClick={() => handleSelect(option.value)}
+                  className={styles.option}
+                >
+                  {option.label}
+                </li>
+              ))
+            ) : (
+              <li className={styles.noResults}>No results found</li>
+            )}
           </ul>
         </div>
       )}

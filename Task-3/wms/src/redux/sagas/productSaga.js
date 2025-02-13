@@ -8,6 +8,8 @@ import {
   searchManufacturers,
   fetchMoleculesSuccess,
   searchMolecules,
+  fetchMolecules,
+  fetchManufacturers,
 } from "../slices/productSlice";
 
 function* fetchProductsSaga() {
@@ -38,14 +40,22 @@ function* fetchProductsSaga() {
   }
 }
 
-function* searchManufacturersSaga(action) {
-  console.log(action.payload);
-  console.log(apiMethods.manufacturers.search);
+function* fetchManufacturersSaga() {
+  try {
+    const response = yield call(apiMethods.manufacturers.list);
+    if (response.data.code === 200) {
+      yield put(fetchManufacturersSuccess(response.data.manufacturers));
+    }
+  } catch (error) {
+    console.error("Failed to search manufacturers:", error);
+  }
+}
 
+function* searchManufacturersSaga(action) {
   try {
     const response = yield call(
-      apiMethods.manufacturers.list
-      // action.payload.searchText
+      apiMethods.manufacturers.search,
+      action.payload
     );
     if (response.data.code === 200) {
       yield put(fetchManufacturersSuccess(response.data.manufacturers));
@@ -55,12 +65,20 @@ function* searchManufacturersSaga(action) {
   }
 }
 
+function* fetchMoleculesSaga() {
+  try {
+    const response = yield call(apiMethods.molecules.list);
+    if (response.data.code === 200) {
+      yield put(fetchMoleculesSuccess(response.data.molecules));
+    }
+  } catch (error) {
+    console.error("Failed to search molecules:", error);
+  }
+}
+
 function* searchMoleculesSaga(action) {
   try {
-    const response = yield call(
-      apiMethods.molecules.list
-      // action.payload.searchText
-    );
+    const response = yield call(apiMethods.molecules.search, action.payload);
     if (response.data.code === 200) {
       yield put(fetchMoleculesSuccess(response.data.molecules));
     }
@@ -73,4 +91,6 @@ export default function* productSaga() {
   yield takeLatest(fetchProductsRequest.type, fetchProductsSaga);
   yield takeLatest(searchManufacturers.type, searchManufacturersSaga);
   yield takeLatest(searchMolecules.type, searchMoleculesSaga);
+  yield takeLatest(fetchManufacturers.type, fetchManufacturersSaga);
+  yield takeLatest(fetchMolecules.type, fetchMoleculesSaga);
 }

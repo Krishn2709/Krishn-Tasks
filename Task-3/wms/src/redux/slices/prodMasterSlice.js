@@ -69,7 +69,7 @@ const addProductSlice = createSlice({
       state.loading.manufacturers = false;
       state.error.manufacturers = action.payload;
     },
-    searchManufacturers: (state, action) => {
+    searchManufacturersMaster: (state) => {
       state.loading.manufacturers = true;
       state.error.manufacturers = null;
     },
@@ -88,7 +88,7 @@ const addProductSlice = createSlice({
       state.loading.molecules = false;
       state.error.molecules = action.payload;
     },
-    searchMolecules: (state, action) => {
+    searchMoleculesMaster: (state) => {
       state.loading.molecules = true;
       state.error.molecules = null;
     },
@@ -102,11 +102,11 @@ export const {
   fetchManufacturers,
   fetchManufacturersSuccess,
   fetchManufacturersFailure,
-  searchManufacturers,
+  searchManufacturersMaster,
   fetchMolecules,
   fetchMoleculesSuccess,
   fetchMoleculesFailure,
-  searchMolecules,
+  searchMoleculesMaster,
   setProduct,
   updateProductField,
   resetProduct,

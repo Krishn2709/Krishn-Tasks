@@ -90,12 +90,22 @@ const productSlice = createSlice({
       state.sorting = action.payload;
       state.pagination.currentPage = 1;
     },
-    searchManufacturers: (state, action) => {
+    searchManufacturers: (state) => {
       if (!state.loadingManufacturers) {
         state.loadingManufacturers = true;
       }
     },
-    searchMolecules: (state, action) => {
+    fetchManufacturers: (state) => {
+      if (!state.loadingManufacturers) {
+        state.loadingManufacturers = true;
+      }
+    },
+    searchMolecules: (state) => {
+      if (!state.loadingMolecules) {
+        state.loadingMolecules = true;
+      }
+    },
+    fetchMolecules: (state) => {
       if (!state.loadingMolecules) {
         state.loadingMolecules = true;
       }
@@ -128,6 +138,8 @@ export const {
   fetchManufacturersSuccess,
   fetchMoleculesSuccess,
   setCurrentPage,
+  fetchManufacturers,
+  fetchMolecules,
 } = productSlice.actions;
 
 export default productSlice.reducer;

@@ -13,6 +13,8 @@ export const ENDPOINTS = {
     UPDATE: (id) => `/api/v1/master/products/${id}`,
     DELETE: (id) => `/api/v1/master/products/${id}`,
     MASTER_DATA: `/api/v1/master-data/productMasterData`,
+    SEARCH: (query) =>
+      `/api/v1/master/products/unpublished?search=${query},name`,
   },
   MANUFACTURERS: {
     LIST: `/api/v1/master/manufacturers`,
@@ -76,6 +78,7 @@ export const apiMethods = {
     update: (id, data) => api.put(ENDPOINTS.PRODUCTS.UPDATE(id), data),
     delete: (id) => api.delete(ENDPOINTS.PRODUCTS.DELETE(id)),
     masterData: () => api.get(ENDPOINTS.PRODUCTS.MASTER_DATA),
+    search: (query) => api.get(ENDPOINTS.PRODUCTS.SEARCH(query)),
   },
   manufacturers: {
     search: (query) => api.get(ENDPOINTS.MANUFACTURERS.SEARCH(query)),

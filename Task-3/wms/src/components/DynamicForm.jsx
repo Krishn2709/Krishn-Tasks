@@ -66,7 +66,10 @@ const DynamicForm = ({
         name={field.key || field.label}
         required={field.required}
         placeholder={field.label}
-        value={formData[field.key || field.label] || ""}
+        value={
+          formData[field.key || field.label] ||
+          (field.label === "Molecules" ? [] : "")
+        }
         onChange={(e) => handleInputChange(e, field)}
         providedOptions={field.options}
         disabled={field.disabled}

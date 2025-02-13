@@ -7,11 +7,11 @@ import {
   fetchManufacturers,
   fetchManufacturersSuccess,
   fetchManufacturersFailure,
-  searchManufacturers,
+  searchManufacturersMaster,
   fetchMolecules,
   fetchMoleculesSuccess,
   fetchMoleculesFailure,
-  searchMolecules,
+  searchMoleculesMaster,
 } from "../slices/prodMasterSlice";
 
 function* fetchProductMasterDataSaga() {
@@ -88,7 +88,7 @@ function* searchMoleculesSaga(action) {
 export default function* addProductWatcher() {
   yield takeLatest(fetchProductMasterData.type, fetchProductMasterDataSaga);
   yield takeLatest(fetchManufacturers.type, fetchManufacturersSaga);
-  yield debounce(300, searchManufacturers.type, searchManufacturersSaga);
+  yield takeLatest(searchManufacturersMaster.type, searchManufacturersSaga);
   yield takeLatest(fetchMolecules.type, fetchMoleculesSaga);
-  yield debounce(300, searchMolecules.type, searchMoleculesSaga);
+  yield takeLatest(searchMoleculesMaster.type, searchMoleculesSaga);
 }
