@@ -102,9 +102,9 @@ export default function Page() {
         package_size: formData.package_size,
       },
       combination: {
-        molecules: (formData.molecules || []) // Ensure it's an array
-          .map((molId) => molecules.find((m) => m.id === molId)?.id)
-          .filter(Boolean), // Remove undefined values
+        molecules: [findByName(molecules, formData.combination)?.id].filter(
+          Boolean
+        ),
       },
       is_discontinued: false,
       is_refrigerated: false,

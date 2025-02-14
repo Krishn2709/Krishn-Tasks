@@ -16,6 +16,7 @@ import productModalConfig from "../../../../data/editProd";
 import {
   searchManufacturers,
   searchMolecules,
+  fetchProductsRequest,
 } from "@/redux/slices/productSlice";
 import { fetchB2CProducts } from "../../../../redux/slices/addProdSlice";
 
@@ -27,11 +28,14 @@ export default function EditProductPage({ params }) {
 
   useEffect(() => {
     dispatch(fetchProductMasterData());
-    dispatch(fetchProductDetails(id));
     dispatch(searchManufacturers());
     dispatch(searchMolecules());
     dispatch(fetchB2CProducts());
   }, [id, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchProductDetails(id));
+  }, []);
 
   const { productMasterData } = useSelector((state) => state.productMasterData);
   const { productData } = useSelector((state) => state.editProduct);
@@ -58,6 +62,7 @@ export default function EditProductPage({ params }) {
     delete transformedData.alternate_product;
     try {
       await dispatch(updateProductRequest({ id, data: transformedData }));
+      dispatch(fetchProductsRequest());
       router.push("/product-master");
     } catch (error) {
       console.error("Error updating product:", error);
