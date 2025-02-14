@@ -59,7 +59,6 @@ export const formDataSlice = createSlice({
     updateFormData: (state, action) => {
       const { key, value } = action.payload;
 
-      // Safely update the form data
       if (key) {
         state.formData = {
           ...state.formData,

@@ -34,7 +34,6 @@ const productSlice = createSlice({
       state.error.addProduct = action.payload;
     },
 
-    // b2c_Products
     fetchB2CProducts: (state) => {
       state.loading.b2cProducts = true;
       state.error.b2cProducts = null;

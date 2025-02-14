@@ -29,7 +29,6 @@ function* fetchProductDetailsSaga(action) {
   }
 }
 
-// Worker Saga: Update product
 function* updateProductSaga(action) {
   try {
     const { id, data } = action.payload;
@@ -45,7 +44,6 @@ function* updateProductSaga(action) {
   }
 }
 
-// Watcher Saga
 export function* editProductSaga() {
   yield takeLatest(fetchProductDetails.type, fetchProductDetailsSaga);
   yield takeLatest(updateProductRequest.type, updateProductSaga);

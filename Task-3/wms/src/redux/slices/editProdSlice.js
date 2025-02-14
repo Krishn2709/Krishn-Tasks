@@ -13,7 +13,6 @@ const editProductSlice = createSlice({
   name: "editProduct",
   initialState,
   reducers: {
-    // Fetch product details
     fetchProductDetails: (state) => {
       state.loading = true;
       state.error = null;
@@ -28,7 +27,6 @@ const editProductSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Update product
     updateProductRequest: (state) => {
       state.updateLoading = true;
       state.updateError = null;
@@ -44,7 +42,6 @@ const editProductSlice = createSlice({
       state.updateSuccess = false;
     },
 
-    // Reset states
     resetUpdateStatus: (state) => {
       state.updateLoading = false;
       state.updateError = null;
@@ -65,7 +62,6 @@ export const {
   resetEditProduct,
 } = editProductSlice.actions;
 
-// Selectors
 export const selectProductData = (state) => state.editProduct.productData;
 export const selectLoading = (state) => state.editProduct.loading;
 export const selectError = (state) => state.editProduct.error;
